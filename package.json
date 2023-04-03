@@ -1,0 +1,10 @@
+{
+  "name": "@newfold-labs/wp-module-ai",
+  "description": "A module for providing artificial intelligence capabilities.",
+  "license": "GPL-2.0-or-later",
+  "private": true,
+  "author": {
+    "name": "Micah Wood",
+    "email": "micah@bluehost.com"
+  }
+}
