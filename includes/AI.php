@@ -4,6 +4,9 @@ namespace NewfoldLabs\WP\Module\AI;
 
 use NewfoldLabs\WP\ModuleLoader\Container;
 
+/**
+ * The class to initialize and load the module
+ */
 class AI {
 
 	/**
@@ -16,14 +19,9 @@ class AI {
 	/**
 	 * Constructor.
 	 *
-	 * @param Container $container
+	 * @param Container $container The primary module container
 	 */
 	public function __construct( Container $container ) {
-
 		$this->container = $container;
-
-		// Module functionality goes here
-
 	}
-
 }

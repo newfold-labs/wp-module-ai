@@ -9,6 +9,18 @@
       "email": "micah@bluehost.com"
     }
   ],
+  "repositories": {
+    "newfold": {
+      "type": "composer",
+      "url": "https://newfold-labs.github.io/satis/",
+      "only": [
+        "newfold-labs/*"
+      ]
+    }
+  },
+  "require-dev": {
+    "newfold-labs/wp-php-standards": "@stable"
+  },
   "autoload": {
     "psr-4": {
       "NewfoldLabs\\WP\\Module\\AI\\": "includes"
@@ -16,5 +28,13 @@
     "files": [
       "bootstrap.php"
     ]
+  },
+  "config": {
+    "platform": {
+      "php": "7.0.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }
