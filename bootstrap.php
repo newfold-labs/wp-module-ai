@@ -23,9 +23,6 @@ if ( function_exists( 'add_action' ) ) {
 				define( 'AI_SERVICE_BASE', 'http://localhost:8000/api/v1' );
 			}
 
-            // Initialize the rest api
-
-
 			register(
 				[
 					'name'     => 'ai',

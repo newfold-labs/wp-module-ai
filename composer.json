@@ -18,6 +18,9 @@
       ]
     }
   },
+  "require": {
+    "newfold-labs/wp-module-data": "@stable"
+  },
   "require-dev": {
     "newfold-labs/wp-php-standards": "@stable"
   },

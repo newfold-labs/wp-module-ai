@@ -3,6 +3,7 @@
 namespace NewfoldLabs\WP\Module\AI\RestApi;
 
 use NewfoldLabs\WP\Module\AI\Utils\AISearchUtil;
+use NewfoldLabs\WP\Module\Data\HiiveConnection;
 
 /**
  * APIs for getting the result from the AI service
@@ -34,10 +35,6 @@ class AISearchController extends \WP_REST_Controller {
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( $this, 'get_search_result' ),
 					'args'                => array(
-						'hive_token'  => array(
-							'required' => true,
-							'type'     => 'string',
-						),
 						'user_prompt' => array(
 							'required' => true,
 							'type'     => 'string',
@@ -65,12 +62,30 @@ class AISearchController extends \WP_REST_Controller {
 	 * @returns \WP_REST_Response|\WP_Error
 	 */
 	public function get_search_result( \WP_REST_Request $request ) {
-		$hiive_token = $request['hiive_token'];
 		$user_prompt = $request['user_prompt'];
 		$identifier  = $request['identifier'];
+
 		$extra       = $request['extra'];
+		$hiive_token = HiiveConnection::get_auth_token();
 
 		$response = AISearchUtil::get_search_results( $hiive_token, $user_prompt, $identifier, $extra );
 		return new \WP_REST_Response( $response, 200 );
+	}
+
+	/**
+	 * Check permissions for routes.
+	 *
+	 * @return \WP_Error
+	 */
+	public function check_permission() {
+//		if ( ! current_user_can( 'manage_options' ) ) {
+//			return new \WP_Error(
+//				'rest_forbidden_context',
+//				__( 'Sorry, you are not allowed to access this endpoint.', 'bluehost-site-migrator' ),
+//				array( 'status' => rest_authorization_required_code() )
+//			);
+//		}
+
+		return true;
 	}
 }
