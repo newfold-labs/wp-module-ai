@@ -38,13 +38,13 @@ class AISearchUtil {
 						'prompt'     => $user_prompt,
 						'identifier' => $identifier,
 						'extra'      => $extra,
-					),
+					)
 				),
 			)
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __('We are unable to process the request at this moment'),
+				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
