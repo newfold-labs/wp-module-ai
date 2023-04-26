@@ -12,15 +12,15 @@ if ( function_exists( 'add_action' ) ) {
 		function () {
 			// Set Global Constants
 			if ( ! defined( 'MODULE_AI_VERSION' ) ) {
-				define( 'MODULE_TASKS_VERSION', '0.0.1' );
+				define( 'MODULE_AI_VERSION', '0.0.1' );
 			}
 
 			if ( ! defined( 'MODULE_AI_DIR' ) ) {
-				define( 'MODULE_TASKS_DIR', __DIR__ );
+				define( 'MODULE_AI_DIR', __DIR__ );
 			}
 
 			if ( ! defined( 'AI_SERVICE_BASE' ) ) {
-				define( 'AI_SERVICE_BASE', 'http://localhost:8000/api/v1' );
+				define( 'AI_SERVICE_BASE', 'https://hiive.cloud/workers/ai-proxy/v1/' );
 			}
 
 			register(

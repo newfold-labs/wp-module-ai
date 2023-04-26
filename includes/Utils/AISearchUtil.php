@@ -20,13 +20,32 @@ class AISearchUtil {
 	public static function get_search_results (
 		string $hiive_token, string $user_prompt, string $identifier, array $extra = null
 	) {
-		$response = wp_remote_post( AI_SERVICE_BASE . '/search', array(
-			'hiive_token' => $hiive_token,
-			'user_prompt' => $user_prompt,
-			'identifier'   => $identifier,
-			'extra'       => $extra
+		if ( ! function_exists( 'wp_json_encode' ) ) {
+			require_once ABSPATH . 'wp-includes/functions.php';
+		}
+
+		$response = wp_remote_post( AI_SERVICE_BASE , array(
+			'method'  => 'POST',
+			'headers' => array(
+				'Content-Type' => 'application/json'
+			),
+			'timeout' => 60,
+			'body'    => wp_json_encode( array(
+				'hiivetoken' => $hiive_token,
+				'prompt'     => $user_prompt,
+				'identifier' => $identifier,
+				'extra'      => $extra
+			) )
 		) );
-		// TODO: Add filters for the response
-		return json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return array(
+				'error' => __('We are unable to process the request at this moment')
+			);
+		}
+		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+		return array(
+			'result'  => $parsed_response['payload']['text'],
+			'post_id' => $parsed_response['payload']['postId']
+		);
 	}
 }

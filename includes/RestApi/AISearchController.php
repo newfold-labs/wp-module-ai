@@ -69,6 +69,11 @@ class AISearchController extends \WP_REST_Controller {
 		$hiive_token = HiiveConnection::get_auth_token();
 
 		$response = AISearchUtil::get_search_results( $hiive_token, $user_prompt, $identifier, $extra );
+
+		if ( array_key_exists( 'error', $response ) ) {
+			return new \WP_Error( 'ServerError', $response['error'] );
+		}
+
 		return new \WP_REST_Response( $response, 200 );
 	}
 
@@ -78,14 +83,6 @@ class AISearchController extends \WP_REST_Controller {
 	 * @return \WP_Error
 	 */
 	public function check_permission() {
-//		if ( ! current_user_can( 'manage_options' ) ) {
-//			return new \WP_Error(
-//				'rest_forbidden_context',
-//				__( 'Sorry, you are not allowed to access this endpoint.', 'bluehost-site-migrator' ),
-//				array( 'status' => rest_authorization_required_code() )
-//			);
-//		}
-
 		return true;
 	}
 }
