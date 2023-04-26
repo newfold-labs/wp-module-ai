@@ -29,7 +29,7 @@ class AISearchUtil {
 			array(
 				'method'  => 'POST',
 				'headers' => array(
-					'Content-Type' => 'application/json'
+					'Content-Type' => 'application/json',
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
@@ -37,20 +37,20 @@ class AISearchUtil {
 						'hiivetoken' => $hiive_token,
 						'prompt'     => $user_prompt,
 						'identifier' => $identifier,
-						'extra'      => $extra
-					)
-				)
+						'extra'      => $extra,
+					),
+				),
 			)
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __('We are unable to process the request at this moment')
+				'error' => __('We are unable to process the request at this moment'),
 			);
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 		return array(
 			'result'  => $parsed_response['payload']['text'],
-			'post_id' => $parsed_response['payload']['postId']
+			'post_id' => $parsed_response['payload']['postId'],
 		);
 	}
 }
