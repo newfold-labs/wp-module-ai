@@ -72,7 +72,7 @@ class AISearchController extends \WP_REST_Controller {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'You are not authorized to make this call' ),
-				array( 'status' => 403 ),
+				array( 'status' => 403 )
 			);
 		}
 
@@ -98,7 +98,7 @@ class AISearchController extends \WP_REST_Controller {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'You must be authenticated to make this call' ),
-				array( 'status' => 401 ),
+				array( 'status' => 401 )
 			);
 		}
 	}

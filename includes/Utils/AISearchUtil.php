@@ -51,7 +51,7 @@ class AISearchUtil {
 
 		if ( ! array_key_exists( 'payload', $parsed_response ) || ! array_key_exists( 'text', $parsed_response['payload'] ) ) {
 			return array(
-				'error' => __(' We are unable to process the request at this moment ')
+				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
 		return array(
