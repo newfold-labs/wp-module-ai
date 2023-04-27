@@ -14,7 +14,7 @@ class AISearchController extends \WP_REST_Controller {
 	 *
 	 * @var string
 	 */
-	protected $namespace = 'nfd-ai/v1';
+	protected $namespace = 'newfold-ai/v1';
 
 	/**
 	 * The base of this controller's route

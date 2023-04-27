@@ -11,16 +11,16 @@ if ( function_exists( 'add_action' ) ) {
 		'plugins_loaded',
 		function () {
 			// Set Global Constants
-			if ( ! defined( 'MODULE_AI_VERSION' ) ) {
-				define( 'MODULE_AI_VERSION', '0.0.1' );
+			if ( ! defined( 'NFD_MODULE_AI_VERSION' ) ) {
+				define( 'NFD_MODULE_AI_VERSION', '0.0.1' );
 			}
 
-			if ( ! defined( 'MODULE_AI_DIR' ) ) {
-				define( 'MODULE_AI_DIR', __DIR__ );
+			if ( ! defined( 'NFD_MODULE_AI_DIR' ) ) {
+				define( 'NFD_MODULE_AI_DIR', __DIR__ );
 			}
 
-			if ( ! defined( 'AI_SERVICE_BASE' ) ) {
-				define( 'AI_SERVICE_BASE', 'https://hiive.cloud/workers/ai-proxy/v1/' );
+			if ( ! defined( 'NFD_AI_SERVICE_BASE' ) ) {
+				define( 'NFD_AI_SERVICE_BASE', 'https://hiive.cloud/workers/ai-proxy/v1/' );
 			}
 
 			register(

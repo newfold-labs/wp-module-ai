@@ -25,7 +25,7 @@ class AISearchUtil {
 		}
 
 		$response = wp_remote_post(
-			AI_SERVICE_BASE,
+			NFD_AI_SERVICE_BASE,
 			array(
 				'method'  => 'POST',
 				'headers' => array(
