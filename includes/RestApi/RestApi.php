@@ -26,26 +26,4 @@ class RestApi {
 			$instance->register_routes();
 		}
 	}
-
-	/**
-	 * Attempt to authenticate the REST API request
-	 *
-	 * @param mixed $status Result of any other authentication attempts
-	 *
-	 * @return \WP_Error|null|bool
-	 */
-	public function authenticate( $status ) {
-
-		// Make sure there wasn't a different authentication method used before this
-		if ( ! is_null( $status ) ) {
-			return $status;
-		}
-
-		// Make sure this is a REST API request
-		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
-			return $status;
-		}
-
-		return true;
-	}
 }

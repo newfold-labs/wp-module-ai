@@ -48,6 +48,12 @@ class AISearchUtil {
 			);
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		if ( ! array_key_exists( 'payload', $parsed_response ) || ! array_key_exists( 'text', $parsed_response['payload'] ) ) {
+			return array(
+				'error' => __(' We are unable to process the request at this moment ')
+			);
+		}
 		return array(
 			'result'  => $parsed_response['payload']['text'],
 			'post_id' => $parsed_response['payload']['postId'],

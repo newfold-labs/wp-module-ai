@@ -68,6 +68,14 @@ class AISearchController extends \WP_REST_Controller {
 		$extra       = $request['extra'];
 		$hiive_token = HiiveConnection::get_auth_token();
 
+		if ( ! $hiive_token ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'You are not authorized to make this call' ),
+				array( 'status' => 403 ),
+			);
+		}
+
 		$response = AISearchUtil::get_search_results( $hiive_token, $user_prompt, $identifier, $extra );
 
 		if ( array_key_exists( 'error', $response ) ) {
@@ -83,6 +91,15 @@ class AISearchController extends \WP_REST_Controller {
 	 * @return \WP_Error
 	 */
 	public function check_permission() {
-		return true;
+		if ( ! function_exists( 'is_user_logged_in' ) ) {
+			include_once ABSPATH . 'wp-includes/pluggable.php';
+		}
+		if ( ! is_user_logged_in() ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'You must be authenticated to make this call' ),
+				array( 'status' => 401 ),
+			);
+		}
 	}
 }
