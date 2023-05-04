@@ -91,15 +91,13 @@ class AISearchController extends \WP_REST_Controller {
 	 * @return \WP_Error
 	 */
 	public function check_permission() {
-		if ( ! function_exists( 'is_user_logged_in' ) ) {
-			include_once ABSPATH . 'wp-includes/pluggable.php';
-		}
-		if ( ! is_user_logged_in() ) {
+		if ( ! current_user_can('read') ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'You must be authenticated to make this call' ),
 				array( 'status' => 401 )
 			);
 		}
+		return true;
 	}
 }

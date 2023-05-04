@@ -20,10 +20,6 @@ class AISearchUtil {
 	public static function get_search_results(
 		string $hiive_token, string $user_prompt, string $identifier, array $extra = null
 	) {
-		if ( ! function_exists( 'wp_json_encode' ) ) {
-			require_once ABSPATH . 'wp-includes/functions.php';
-		}
-
 		$response = wp_remote_post(
 			NFD_AI_SERVICE_BASE,
 			array(

@@ -21,9 +21,24 @@ class AI {
 	 * Constructor.
 	 *
 	 * @param Container $container The primary module container
+	 * Instantiate controllers and register routes.
 	 */
 	public function __construct( Container $container ) {
 		$this->container = $container;
-		new RestApi();
+		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+	}
+
+	/**
+	 * Function to register custom API routes and controllers
+	 */
+	final public function register_routes() {
+		$controllers = array(
+			'NewfoldLabs\\WP\\Module\\AI\\RestApi\\AISearchController',
+		);
+
+		foreach ( $controllers as $controller ) {
+			$instance = new $controller();
+			$instance->register_routes();
+		}
 	}
 }
