@@ -2,11 +2,25 @@
 
 namespace NewfoldLabs\WP\Module\AI\Utils;
 
+use NewfoldLabs\WP\Module\Data\SiteCapabilities;
+
 /**
  * The utility pass through for interacting with the
  * AI service
  */
 class AISearchUtil {
+
+	/**
+	 * The function to check capabilities for module AI
+	 */
+	private static function _check_capabilities( ) {
+		$capability = new SiteCapabilities();
+
+		$help_enabled = $capability->get( 'canAccessHelpCenter' );
+		$ai_enabled   = $capability->get( 'canAccessAI' );
+
+		return $help_enabled && $ai_enabled;
+	}
 
 	/**
 	 * The function to proxy to the AI service and get a response
@@ -43,16 +57,24 @@ class AISearchUtil {
 				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
-		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( ! array_key_exists( 'payload', $parsed_response ) || ! array_key_exists( 'text', $parsed_response['payload'] ) ) {
+		if ( !self::_check_capabilities() ) {
 			return array(
 				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
-		return array(
-			'result'  => $parsed_response['payload']['text'],
-			'post_id' => $parsed_response['payload']['postId'],
-		);
+
+		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		try {
+			return array(
+				'result'  => $parsed_response['payload']['choices'][0]['text'],
+				'post_id' => $parsed_response['payload']['postId'],
+			);
+		} catch ( \Exception $exception ) {
+			return array(
+				'error' => __( 'We are unable to process the request at this moment' ),
+			);
+		}
 	}
 }
