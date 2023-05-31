@@ -34,6 +34,13 @@ class AISearchUtil {
 	public static function get_search_results(
 		string $hiive_token, string $user_prompt, string $identifier, array $extra = null
 	) {
+
+		if ( !self::_check_capabilities() ) {
+			return array(
+				'error' => __( 'We are unable to process the request at this moment' ),
+			);
+		}
+
 		$response = wp_remote_post(
 			NFD_AI_SERVICE_BASE,
 			array(
@@ -53,12 +60,6 @@ class AISearchUtil {
 			)
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
-			);
-		}
-
-		if ( !self::_check_capabilities() ) {
 			return array(
 				'error' => __( 'We are unable to process the request at this moment' ),
 			);
