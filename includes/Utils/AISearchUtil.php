@@ -69,7 +69,7 @@ class AISearchUtil {
 
 		try {
 			return array(
-				'result'  => $parsed_response['payload']['choices'][0]['text'],
+				'result'  => $parsed_response['payload']['choices'],
 				'post_id' => $parsed_response['payload']['postId'],
 			);
 		} catch ( \Exception $exception ) {

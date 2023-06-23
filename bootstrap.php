@@ -11,10 +11,6 @@ if ( function_exists( 'add_action' ) ) {
 		'plugins_loaded',
 		function () {
 			// Set Global Constants
-			if ( ! defined( 'NFD_MODULE_AI_VERSION' ) ) {
-				define( 'NFD_MODULE_AI_VERSION', '0.0.1' );
-			}
-
 			if ( ! defined( 'NFD_MODULE_AI_DIR' ) ) {
 				define( 'NFD_MODULE_AI_DIR', __DIR__ );
 			}
