@@ -19,9 +19,7 @@
   "homepage": "https://github.com/newfold-labs/wp-module-ai#readme",
   "dependencies": {
     "@newfold-labs/wp-module-ai": "github:newfold-labs/js-utility-ai#1.0.0",
-    "react-countdown-simple": "^1.0.12"
-  },
-  "peerDependencies": {
+    "react-countdown-simple": "^1.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

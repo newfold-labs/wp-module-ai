@@ -36,7 +36,8 @@ module.exports = {
     devtool: 'eval-source-map',
     resolve :{
       alias: {
-        react: path.resolve('./node_modules/react')
+        react: path.resolve('./node_modules/react'),
+        'react-dom': path.resolve('./node_modules/react-dom')
       }
     }
  
