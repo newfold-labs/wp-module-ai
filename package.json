@@ -2,7 +2,7 @@
   "name": "wp-ai-generator-module",
   "version": "1.0.0",
   "description": "To support scripts and UI components in wp-module-ai",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "wp-scripts start",
     "build": "wp-scripts build"
