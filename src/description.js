@@ -15,9 +15,9 @@ import DescriptionGenerator from '@newfold-labs/wp-module-ai';
     }
   };
 
-  const siteDesc = document.getElementById('blogdescription').value;
-  const siteTitle = document.getElementById('blogname').value;
-  const siteUrl = document.getElementById('home').value;
+  const siteDesc = document.getElementById('blogdescription') && document.getElementById('blogdescription').value;
+  const siteTitle = document.getElementById('blogname') && document.getElementById('blogname').value;
+  const siteUrl = document.getElementById('home') && document.getElementById('home').value;
 
   const root = ReactDOM.createRoot(document.getElementById('description-generator-container'));
   root.render(<DescriptionGenerator
