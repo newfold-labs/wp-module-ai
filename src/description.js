@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { DescriptionGenerator } from '@newfold-labs/wp-module-ai';
+import DescriptionGenerator from '@newfold-labs/wp-module-ai';
 
   const handleSuggestionClick = (suggestion) => {
     if(suggestion){
