@@ -8,7 +8,7 @@ import DescriptionGenerator from '@newfold-labs/wp-module-ai';
       if(inputElement){
         inputElement.value = suggestion;
       }
-      let excerptElement = document.querySelectorAll('#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea')[0];
+      let excerptElement = document.querySelector('#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea');
       if(excerptElement){
         excerptElement.value = suggestion;
       }

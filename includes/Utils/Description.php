@@ -6,9 +6,14 @@ class Description {
     public function set_description_container() {
         $plugin_url = BLUEHOST_PLUGIN_URL;
         $script_url = $plugin_url . '/vendor/newfold-labs/wp-module-onboarding/vendor/newfold-labs/wp-module-ai/dist/index.js';
-        /* $script_url = '../../dist/index.js'; */
-        wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true); 
-        ?>
+      /*   echo '<script>console.log("dsdsssds' . $script_url . '")</script>';
+        echo '<script>console.log("dsdsssds' . NFD_MODULE_AI_DIR . '")</script>';
+        $script_url = NFD_MODULE_AI_DIR.'/dist/index.js' */;
+        wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true);
+        global $pagenow;
+
+        if ($pagenow == 'options-general.php') {
+            ?>
             <div id="description-generator-container"></div>
             <script type='text/javascript'>
                 jQuery(document).ready(function($) {
@@ -16,6 +21,7 @@ class Description {
                 });
             </script>;
         <?php
+        }
     }
 
     public function description_admin_init() {
