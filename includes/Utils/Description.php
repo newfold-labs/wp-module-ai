@@ -9,7 +9,8 @@ class Description {
       /*   echo '<script>console.log("dsdsssds' . $script_url . '")</script>';
         echo '<script>console.log("dsdsssds' . NFD_MODULE_AI_DIR . '")</script>';
         $script_url = NFD_MODULE_AI_DIR.'/dist/index.js' */;
-        wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true);
+
+        wp_enqueue_script('custom-plugin-script-description', '../../dist/index.js', array(), '1.0', true);
         global $pagenow;
 
         if ($pagenow == 'options-general.php') {
@@ -18,6 +19,43 @@ class Description {
             <script type='text/javascript'>
                 jQuery(document).ready(function($) {
                     $("#description-generator-container").insertAfter($("#blogdescription").closest("tr"));
+                });
+            </script>;
+        <?php
+        }
+        if ($pagenow == 'post-new.php' || $pagenow == 'post.php') {
+            ?>
+            <div id="description-generator-container"></div>
+            <script type='text/javascript'>
+                jQuery(document).ready(function($) {
+                    async function waitForElement(selector, maxAttempts = 5) {
+                    let attempts = 0;
+                    
+                    while (document.querySelector(selector) === null && attempts < maxAttempts) {
+                        attempts++;
+                        console.log("attempts", attempts);
+                        await new Promise(resolve => requestAnimationFrame(resolve));
+                    }
+                    
+                    if (attempts >= maxAttempts) {
+                        throw new Error(`Failed to find element with selector "${selector}" after ${maxAttempts} attempts.`);
+                    }
+
+                    return document.querySelector(selector);
+                }
+
+                waitForElement('#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea')
+                    .then(element => {
+                        if(element){
+                            console.log("elemnt loaded", element);
+                            // Element has loaded, do something with it.
+                            $("#description-generator-container").insertAfter($("#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea").closest(".components-base-control"));
+                        }
+                    })
+                    .catch(error => {
+                        // Handle error (element not found)
+                        console.error(error);
+                    });
                 });
             </script>;
         <?php
