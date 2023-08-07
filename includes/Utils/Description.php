@@ -4,12 +4,6 @@ namespace NewfoldLabs\WP\Module\AI\Utils;
 
 class Description {
     public function set_description_container() {
-        $plugin_url = BLUEHOST_PLUGIN_URL;
-        $script_url = $plugin_url . '/vendor/newfold-labs/wp-module-onboarding/vendor/newfold-labs/wp-module-ai/dist/index.js';
-      /*   echo '<script>console.log("dsdsssds' . $script_url . '")</script>';
-        echo '<script>console.log("dsdsssds' . NFD_MODULE_AI_DIR . '")</script>';
-        $script_url = NFD_MODULE_AI_DIR.'/dist/index.js' */;
-
         wp_enqueue_script('custom-plugin-script-description', '../../dist/index.js', array(), '1.0', true);
         global $pagenow;
 
