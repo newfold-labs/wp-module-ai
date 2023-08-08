@@ -5,6 +5,7 @@ namespace NewfoldLabs\WP\Module\AI\Utils;
 class Description {
     public function set_description_container() {
         wp_enqueue_script('custom-plugin-script-description', '../../dist/index.js', array(), '1.0', true);
+        wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true);
         global $pagenow;
 
         if ($pagenow == 'options-general.php') {
@@ -20,43 +21,20 @@ class Description {
         if ($pagenow == 'post-new.php' || $pagenow == 'post.php') {
             ?>
             <div id="description-generator-container"></div>
-            <script type='text/javascript'>
-                jQuery(document).ready(function($) {
-                    async function waitForElement(selector, maxAttempts = 5) {
-                    let attempts = 0;
-                    
-                    while (document.querySelector(selector) === null && attempts < maxAttempts) {
-                        attempts++;
-                        console.log("attempts", attempts);
-                        await new Promise(resolve => requestAnimationFrame(resolve));
-                    }
-                    
-                    if (attempts >= maxAttempts) {
-                        throw new Error(`Failed to find element with selector "${selector}" after ${maxAttempts} attempts.`);
-                    }
-
-                    return document.querySelector(selector);
-                }
-
-                waitForElement('#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea')
-                    .then(element => {
-                        if(element){
-                            console.log("elemnt loaded", element);
-                            // Element has loaded, do something with it.
-                            $("#description-generator-container").insertAfter($("#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea").closest(".components-base-control"));
-                        }
-                    })
-                    .catch(error => {
-                        // Handle error (element not found)
-                        console.error(error);
-                    });
-                });
-            </script>;
         <?php
         }
     }
 
+    public function enqueue_custom_gutenberg_plugin() {
+        global $pagenow;
+        if ($pagenow !== 'post-new.php' && $pagenow !== 'post.php') {
+            return;
+        }
+        wp_enqueue_script('custom-gutenberg-plugin-script', '../../dist/index.js', array('wp-edit-post', 'wp-plugins', 'wp-element', 'wp-components'), '1.0', true);
+    }
+    
     public function description_admin_init() {
+        add_action('enqueue_block_editor_assets', array($this, 'enqueue_custom_gutenberg_plugin'));
         // Hook the set_description_container method to the admin_footer action
         add_action('admin_footer', array($this, 'set_description_container'));
     }

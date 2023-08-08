@@ -1,5 +1,6 @@
 const { render } = wp.element;
 import DescriptionGenerator from '@newfold-labs/wp-module-ai';
+import './excerpt-custom-panel';
 
 const handleSuggestionClick = (suggestion) => {
   if(suggestion){
