@@ -93,9 +93,10 @@ class AISearchUtil {
 	/**
 	 * The function to get the default results from the proxy
 	 *
+	 * @param string $hiive_token The Hive token
 	 * @return array
 	 */
-	public static function get_default_search_results() {
+	public static function get_default_search_results( $hiive_token ) {
 		if (!self::_check_help_capability()) {
 			return array(
 				'error' => __('We are unable to process the request at this moment'),
@@ -110,6 +111,11 @@ class AISearchUtil {
 					'Content-Type' => 'application/json',
 				),
 				'timeout' => 60,
+				'body'    => wp_json_encode(
+					array(
+						'hiivetoken' => $hiive_token,
+					)
+				),
 			)
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {

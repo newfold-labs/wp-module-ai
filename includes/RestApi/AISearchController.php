@@ -105,7 +105,17 @@ class AISearchController extends \WP_REST_Controller {
 	 * @returns \WP_REST_Response|\WP_Error
 	 */
 	public function get_default_search_results( \WP_REST_Request $request ) {
-		$response = AISearchUtil::get_default_search_results();
+		$hiive_token = HiiveConnection::get_auth_token();
+
+		if ( ! $hiive_token ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'You are not authorized to make this call' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$response = AISearchUtil::get_default_search_results( $hiive_token );
 
 		if ( array_key_exists( 'error', $response ) ) {
 			return new \WP_Error( 'ServerError', $response['error'] );
