@@ -1,87 +1,63 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, createPortal } from '@wordpress/element';
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { useSelect } from '@wordpress/data';
 import DescriptionGenerator from '@newfold-labs/wp-module-ai';
 
-const withCustomPlacement = (WrappedComponent) => {
-  return (props) => {
-    const [targetElement, setTargetElement] = useState(null);
-    const isSidebarOpened = useSelect((select) => select('core/edit-post').isEditorSidebarOpened(), []);
-
-    useEffect(() => {
-      const checkForElement = () => {
-        const element = document.querySelector('.editor-post-excerpt');
-        if (element && !targetElement) {
-          setTargetElement(element);
-        }
-      };
-
-      checkForElement();
-      const intervalId = setInterval(checkForElement, 300);
-      
-      return () => {
-        clearInterval(intervalId);
-      };
-    }, [targetElement]); // Removed isSidebarOpened from the dependency array
-
-    useEffect(() => {
-      if (targetElement && isSidebarOpened) {
-        const customPanel = document.querySelector('.excerpt-custom-panel');
-        if (customPanel && targetElement.parentNode) {
-          targetElement.parentNode.insertBefore(customPanel, targetElement.nextSibling);
-        }
-
-        return () => {
-          if (customPanel && customPanel.parentNode && customPanel.parentNode.contains(customPanel)) {
-            customPanel.parentNode.removeChild(customPanel);
-          }
-        };
-      }
-    }, [targetElement, isSidebarOpened]);
-
-    return <WrappedComponent {...props} />;
-  };
-};
-
 function ExcerptCustomPanel() {
-  
-  const handleSuggestionClick = (suggestion) => {
-    if(suggestion){
-      const inputElement = document.getElementById('blogdescription');
-      if(inputElement){
-        inputElement.value = suggestion;
-      }
-      let excerptElement = document.querySelector('#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea');
-      if(excerptElement){
-        excerptElement.value = suggestion;
-      }
-    }
-  };
+  const [targetElement, setTargetElement] = useState(null);
+  // const isSidebarOpened = useSelect((select) => select('core/edit-post').isEditorSidebarOpened(), []);
 
-  return (
-    <PluginDocumentSettingPanel
+  // const element = document.querySelector('#editor .editor-post-excerpt');
+
+  useEffect(() => {
+    const checkForElement = async () => {
+      while (!document.querySelector('#editor .editor-post-excerpt')) {
+        await new Promise(resolve => setTimeout(resolve, 300)); // Wait for 300ms
+      }
+      setTargetElement(document.querySelector('#editor .editor-post-excerpt'));
+    };
+  
+    const editorElement = document.querySelector('#editor');
+    if (editorElement) {
+      // Initialize the MutationObserver
+      const observer = new MutationObserver(checkForElement);
+  
+      // Start observing changes in the editor's child elements
+      observer.observe(editorElement, { childList: true, subtree: true });
+  
+      // Run the check initially
+      checkForElement();
+  
+      // Clean up the observer when the component unmounts
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  if (!targetElement) {
+    console.log("nahi mila");
+    return null;
+  }
+  return <PluginDocumentSettingPanel
       name="excerpt-custom-panel"
-      title="Show Excerpt Suggestions"
+      title="Excerpt Custom Panel"
       className="excerpt-custom-panel"
     >
-      <DescriptionGenerator
-      siteDesc={ "This is a driving school" }
-      siteTitle={ " Driving school site"}
-      siteSubtype=""
-      siteType=""
-      siteUrl={ "google.com"}
-      handleSuggestionClick={handleSuggestionClick}
-    />
+      {createPortal(
+        <DescriptionGenerator
+        siteDesc={"This is a driving school"}
+        siteTitle={" Driving school site"}
+        siteSubtype=""
+        siteType=""
+        siteUrl={"google.com"}
+        targetElementSelector="#editor .editor-post-excerpt .editor-post-excerpt__textarea textarea"
+      />, targetElement
+      )}
     </PluginDocumentSettingPanel>
-  );
-
 }
 
-const EnhancedExcerptCustomPanel = withCustomPlacement(ExcerptCustomPanel);
-
 registerPlugin('excerpt-custom-panel', {
-  render: EnhancedExcerptCustomPanel,
+  render: ExcerptCustomPanel,
 });
 
-export default EnhancedExcerptCustomPanel;
+export default ExcerptCustomPanel;
