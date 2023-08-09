@@ -104,7 +104,7 @@ class AISearchUtil {
 		}
 
 		$response = wp_remote_post(
-			NFD_AI_SERVICE_BASE,
+			NFD_AI_SERVICE_BASE . 'defaultResults',
 			array(
 				'method'  => 'POST',
 				'headers' => array(
