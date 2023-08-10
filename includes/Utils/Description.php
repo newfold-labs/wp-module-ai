@@ -4,7 +4,8 @@ namespace NewfoldLabs\WP\Module\AI\Utils;
 
 class Description {
     public function set_description_container() {
-        $script_url = plugins_url('../../dist/index.js', __FILE__);
+        /* $script_url = plugins_url('../../dist/index.js', __FILE__); */
+        $script_url = plugins_url('dist/index.js', NFD_MODULE_AI_DIR);
         wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true);
         global $pagenow;
 
@@ -30,7 +31,8 @@ class Description {
         if ($pagenow !== 'post-new.php' && $pagenow !== 'post.php') {
             return;
         }
-        $script_url = plugins_url('../../dist/index.js', __FILE__);
+       /* $script_url = plugins_url('../../dist/index.js', __FILE__); */
+        $script_url = plugins_url('dist/index.js', NFD_MODULE_AI_DIR);
         wp_enqueue_script('custom-gutenberg-plugin-script', $script_url , array('wp-edit-post', 'wp-plugins', 'wp-element', 'wp-components'), '1.0', true);
     }
     
