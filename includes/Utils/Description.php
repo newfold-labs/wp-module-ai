@@ -6,6 +6,7 @@ class Description {
     public function set_description_container() {
         /* $script_url = plugins_url('../../dist/index.js', __FILE__); */
         $script_url = plugins_url('dist/index.js', NFD_MODULE_AI_DIR);
+        echo '<script>console.log("normal script url", "' . $script_url . '")</script>';
         wp_enqueue_script('custom-plugin-script-description', $script_url, array(), '1.0', true);
         global $pagenow;
 
@@ -33,6 +34,7 @@ class Description {
         }
        /* $script_url = plugins_url('../../dist/index.js', __FILE__); */
         $script_url = plugins_url('dist/index.js', NFD_MODULE_AI_DIR);
+        echo '<script>console.log("normal script url2", "' . $script_url . '")</script>';
         wp_enqueue_script('custom-gutenberg-plugin-script', $script_url , array('wp-edit-post', 'wp-plugins', 'wp-element', 'wp-components'), '1.0', true);
     }
     
