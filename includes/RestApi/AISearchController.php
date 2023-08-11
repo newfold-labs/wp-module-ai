@@ -52,6 +52,18 @@ class AISearchController extends \WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/default',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array($this, 'get_default_search_results'),
+					'permission_callback' => array($this, 'check_permission'),
+				),
+			)
+		);
 	}
 
 	/**
@@ -77,6 +89,33 @@ class AISearchController extends \WP_REST_Controller {
 		}
 
 		$response = AISearchUtil::get_search_results( $hiive_token, $user_prompt, $identifier, $extra );
+
+		if ( array_key_exists( 'error', $response ) ) {
+			return new \WP_Error( 'ServerError', $response['error'] );
+		}
+
+		return new \WP_REST_Response( $response, 200 );
+	}
+
+	/**
+	 * Proxy to AI service for getting default search results
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 *
+	 * @returns \WP_REST_Response|\WP_Error
+	 */
+	public function get_default_search_results( \WP_REST_Request $request ) {
+		$hiive_token = HiiveConnection::get_auth_token();
+
+		if ( ! $hiive_token ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'You are not authorized to make this call' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		$response = AISearchUtil::get_default_search_results( $hiive_token );
 
 		if ( array_key_exists( 'error', $response ) ) {
 			return new \WP_Error( 'ServerError', $response['error'] );
