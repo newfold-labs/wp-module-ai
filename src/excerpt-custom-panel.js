@@ -18,6 +18,9 @@ function ExcerptCustomPanel() {
       setTargetElement(document.querySelector('#editor .editor-post-excerpt'));
     };
   
+    /* since the gutenberg settings sidebar re-renders and it unmounts the custom panel,
+     have added a mutation observer to the parent element which checks for the changes in subtree
+      and applies the changes againon the re-rendered DOM */
     const editorElement = document.querySelector('#editor');
     if (editorElement) {
       // Initialize the MutationObserver
