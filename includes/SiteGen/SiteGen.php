@@ -63,15 +63,15 @@ class SiteGen {
 	 * @param string $identifier The identifier to be used for generating the required meta
 	 */
 	private static function validate_site_info( $site_info, $identifier ) {
-		if ( in_array( $identifier, self::$required_validations, true ) ) {
+		if ( array_key_exists( $identifier, self::$required_validations ) ) {
 			$validations = self::$required_validations[ $identifier ];
 			foreach ( $validations as $required_key ) {
-				if ( ! in_array( $required_key, $site_info, true ) ) {
+				if ( ! array_key_exists( $required_key, $site_info ) ) {
 					return false;
 				}
 			}
-			return true;
 		}
+		return true;
 	}
 
 	/**
@@ -139,8 +139,8 @@ class SiteGen {
 		$patterns           = json_decode( wp_remote_retrieve_body( $response ), true );
 		$processed_patterns = array();
 
-		foreach ( $patterns as $pattern ) {
-			array_push( $processed_patterns, array( $pattern['slug'] => $pattern ) );
+		foreach ( $patterns['data'] as $pattern ) {
+			$processed_patterns[ $pattern['slug'] ] = $pattern;
 		}
 
 		return $processed_patterns;
@@ -174,7 +174,7 @@ class SiteGen {
 		$unique_categories = array();
 		foreach ( $content_structure as $homepage => $structure ) {
 			foreach ( $structure as $category ) {
-				if ( ! in_array( $unique_categories, $category, true ) ) {
+				if ( ! in_array( $category, $unique_categories, true ) ) {
 					array_push( $unique_categories, $category );
 				}
 			}
@@ -186,13 +186,14 @@ class SiteGen {
 		foreach ( $unique_categories as $category ) {
 			$patterns_for_category = self::get_patterns_for_category( $category );
 			if ( count( $patterns_for_category ) <= 5 ) {
-				$random_selected_patterns = $patterns_for_category;
+				$random_selected_patterns = array_rand( $patterns_for_category, count( $patterns_for_category ) );
 			} else {
 				$random_selected_patterns = array_rand( $patterns_for_category, 5 );
 			}
 
-			array_push( $category_pattern_map, array( $category => array() ) );
-			foreach ( $random_selected_patterns as $pattern ) {
+			$category_pattern_map[ $category ] = array();
+			foreach ( $random_selected_patterns as $pattern_slug ) {
+				$pattern = $patterns_for_category[ $pattern_slug ];
 				// Generate content for these patterns
 				$response = wp_remote_post(
 					NFD_AI_BASE . 'generateSiteMeta',
@@ -205,7 +206,7 @@ class SiteGen {
 							array(
 								'hiivetoken' => HiiveConnection::get_auth_token(),
 								'prompt'     => array(
-									'pattern' => $pattern,
+									'pattern' => $pattern['content'],
 									'prompt'  => self::get_prompt_from_info(
 										array(
 											'site_description' => $site_description,
@@ -310,7 +311,7 @@ class SiteGen {
 	 * @param array   $target_audience  Generated target audience.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate ) {
+	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
 		$generated_content_structures = self::generate_site_meta(
 			array( 'site_description' => $site_description ),
 			'contentstructure'
