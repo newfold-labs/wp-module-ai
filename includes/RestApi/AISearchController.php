@@ -59,8 +59,8 @@ class AISearchController extends \WP_REST_Controller {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => array($this, 'get_default_search_results'),
-					'permission_callback' => array($this, 'check_permission'),
+					'callback'            => array( $this, 'get_default_search_results' ),
+					'permission_callback' => array( $this, 'check_permission' ),
 				),
 			)
 		);
@@ -130,7 +130,7 @@ class AISearchController extends \WP_REST_Controller {
 	 * @return \WP_Error
 	 */
 	public function check_permission() {
-		if ( ! current_user_can('read') ) {
+		if ( ! current_user_can( 'read' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'You must be authenticated to make this call' ),
