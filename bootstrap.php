@@ -17,10 +17,13 @@ if ( function_exists( 'add_action' ) ) {
 
 			if ( ! defined( 'NFD_AI_SERVICE_BASE' ) ) {
 				define( 'NFD_AI_SERVICE_BASE', 'https://hiive.cloud/workers/ai-proxy/v1/' );
+				define( 'NFD_AI_BASE', 'https://hiive.cloud/workers/ai-proxy/' );
+				define( 'NFD_PATTERNS_BASE', 'https://patterns.hiive.cloud/' );
+				define( 'NFD_SITEGEN_OPTION', 'nfd-ai-site-gen' );
 			}
 
 			register(
-				[
+				array(
 					'name'     => 'ai',
 					'label'    => __( 'ai', 'newfold-ai-module' ),
 					'callback' => function ( Container $container ) {
@@ -28,9 +31,8 @@ if ( function_exists( 'add_action' ) ) {
 					},
 					'isActive' => true,
 					'isHidden' => true,
-				]
+				)
 			);
-
 		}
 	);
 
