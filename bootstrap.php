@@ -23,7 +23,7 @@ if ( function_exists( 'add_action' ) ) {
 			}
 
 			register(
-				[
+				array(
 					'name'     => 'ai',
 					'label'    => __( 'ai', 'newfold-ai-module' ),
 					'callback' => function ( Container $container ) {
@@ -31,9 +31,8 @@ if ( function_exists( 'add_action' ) ) {
 					},
 					'isActive' => true,
 					'isHidden' => true,
-				]
+				)
 			);
-
 		}
 	);
 

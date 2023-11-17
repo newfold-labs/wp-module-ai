@@ -81,10 +81,11 @@ class SiteGen {
 	 */
 	private static function get_sitegen_from_cache( $identifier ) {
 		$site_gen = get_option( NFD_SITEGEN_OPTION, null );
-		if ( $site_gen && in_array( $identifier, $site_gen, true ) ) {
-			return $site_gen[ $identifier ];
-		} else {
+		if ( ! $site_gen ) {
 			update_option( NFD_SITEGEN_OPTION, array() );
+		}
+		if ( $site_gen && array_key_exists( $identifier, $site_gen ) ) {
+			return $site_gen[ $identifier ];
 		}
 		return null;
 	}
@@ -169,7 +170,13 @@ class SiteGen {
 			}
 		}
 
-		$keywords = self::generate_site_meta( array( 'site_description' => $site_description ), 'keywords' );
+		$keywords = self::generate_site_meta(
+			array(
+				'site_description' => $site_description,
+				'content_style'    => $content_style,
+			),
+			'keywords'
+		);
 
 		$unique_categories = array();
 		foreach ( $content_structure as $homepage => $structure ) {
@@ -230,6 +237,8 @@ class SiteGen {
 
 		// Store the categories
 		self::cache_sitegen_response( 'contentRegenerate', $category_pattern_map );
+
+		return $category_pattern_map;
 	}
 
 	/**
@@ -311,7 +320,7 @@ class SiteGen {
 	 * @param array   $target_audience  Generated target audience.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
+	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = true ) {
 		$generated_content_structures = self::generate_site_meta(
 			array( 'site_description' => $site_description ),
 			'contentstructure'
@@ -333,11 +342,15 @@ class SiteGen {
 		);
 
 		// Choose random categories for the generated patterns and return
-		foreach ( $random_homepages as $slug => $structure ) {
-			array_push( $generated_homepages, array( $slug => array() ) );
-			foreach ( $structure as $pattern_category ) {
+		foreach ( $random_homepages as $slug ) {
+			$generated_homepages[ $slug ] = array();
+			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
+				if ( ! $generated_patterns[ $pattern_category ] ) {
+					continue;
+				}
 				// Get a random pattern for the category.
 				$random_pattern = array_rand( $generated_patterns[ $pattern_category ] );
+				$random_pattern = $generated_patterns[ $random_pattern ];
 				array_push( $generated_homepages[ $slug ], $random_pattern );
 			}
 		}

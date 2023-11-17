@@ -2,6 +2,7 @@
 
 namespace NewfoldLabs\WP\Module\AI\RestApi;
 
+use NewfoldLabs\WP\Module\AI\SiteGen\SiteGen;
 use NewfoldLabs\WP\Module\AI\Utils\AISearchUtil;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 
@@ -64,6 +65,87 @@ class AISearchController extends \WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/sitegen',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'sitegen' ),
+					'args'                => array(
+						'site_info'  => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+						'identifier' => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+					),
+					'permission_callback' => array( $this, 'check_permission' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/homepages',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'homepages' ),
+					'args'                => array(
+						'site_description' => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+						'content_style'    => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+						'target_audience'  => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+					),
+					'permission_callback' => array( $this, 'check_permission' ),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Proxy to the AI service to get the responses.
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 *
+	 * @returns \WP_REST_Response|\WP_Error
+	 */
+	public function sitegen( \WP_REST_Request $request ) {
+		$site_info  = $request['site_info'];
+		$identifier = $request['identifier'];
+
+		$response = SiteGen::generate_site_meta( $site_info, $identifier );
+
+		return new \WP_REST_Response( $response, 200 );
+	}
+
+	/**
+	 * Proxy to the AI service to get the responses.
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 *
+	 * @returns \WP_REST_Response|\WP_Error
+	 */
+	public function homepages( \WP_REST_Request $request ) {
+		$site_description = $request['site_description'];
+		$content_style    = $request['content_style'];
+		$target_audience  = $request['target_audience'];
+
+		$response = SiteGen::get_home_pages( $site_description, $content_style, $target_audience );
+
+		return new \WP_REST_Response( $response, 200 );
 	}
 
 	/**
