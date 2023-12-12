@@ -153,14 +153,14 @@ class SiteGen {
 	 * @param string  $site_description  The site description (the user prompt)
 	 * @param array   $content_style     The generated content style.
 	 * @param array   $target_audience   The generated target audience.
-	 * @param array   $content_structure The content structures generated / cached
+	 * @param array   $content_structures The content structures generated / cached
 	 * @param boolean $skip_cache        If we need to skip cache.
 	 */
 	private static function generate_pattern_content(
 		$site_description,
 		$content_style,
 		$target_audience,
-		$content_structure,
+		$content_structures,
 		$skip_cache = false
 	) {
 		if ( ! $skip_cache ) {
@@ -179,7 +179,7 @@ class SiteGen {
 		);
 
 		$unique_categories = array();
-		foreach ( $content_structure as $homepage => $structure ) {
+		foreach ( $content_structures as $homepage => $structure ) {
 			foreach ( $structure as $category ) {
 				if ( ! in_array( $category, $unique_categories, true ) ) {
 					array_push( $unique_categories, $category );
@@ -200,8 +200,7 @@ class SiteGen {
 
 			$category_pattern_map[ $category ] = array();
 			foreach ( $random_selected_patterns as $pattern_slug ) {
-				$pattern = $patterns_for_category[ $pattern_slug ];
-				// Generate content for these patterns
+				$pattern  = $patterns_for_category[ $pattern_slug ];
 				$response = wp_remote_post(
 					NFD_AI_BASE . 'generateSiteMeta',
 					array(
@@ -325,6 +324,12 @@ class SiteGen {
 			array( 'site_description' => $site_description ),
 			'contentstructure'
 		);
+
+		// If we got an error, return that right away
+		if ( array_key_exists( 'error', $generated_content_structures ) ) {
+			return $generated_content_structures;
+		}
+
 		// Check if we have the response in cache already
 		if ( ! $regenerate ) {
 			$generated_homepages = self::get_sitegen_from_cache( 'homepages' );
@@ -350,7 +355,7 @@ class SiteGen {
 				}
 				// Get a random pattern for the category.
 				$random_pattern = array_rand( $generated_patterns[ $pattern_category ] );
-				$random_pattern = $generated_patterns[ $random_pattern ];
+				$random_pattern = $generated_patterns[ $pattern_category ][ $random_pattern ];
 				array_push( $generated_homepages[ $slug ], $random_pattern );
 			}
 		}

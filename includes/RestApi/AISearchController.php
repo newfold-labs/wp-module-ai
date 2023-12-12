@@ -145,6 +145,10 @@ class AISearchController extends \WP_REST_Controller {
 
 		$response = SiteGen::get_home_pages( $site_description, $content_style, $target_audience );
 
+		if ( array_key_exists( 'error', $response ) ) {
+			return new \WP_Error( 'bad_request', $response['error'], 400 );
+		}
+
 		return new \WP_REST_Response( $response, 200 );
 	}
 
