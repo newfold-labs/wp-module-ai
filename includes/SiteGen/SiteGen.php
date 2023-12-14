@@ -2,6 +2,7 @@
 
 namespace NewfoldLabs\WP\Module\AI\SiteGen;
 
+use NewfoldLabs\WP\Module\AI\Utils\PatternParser;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 use NewfoldLabs\WP\Module\Data\SiteCapabilities;
 
@@ -199,38 +200,59 @@ class SiteGen {
 			}
 
 			$category_pattern_map[ $category ] = array();
+			$category_content                  = array();
+			$category_patterns                 = array();
+			$category_base_patterns            = array();
 			foreach ( $random_selected_patterns as $pattern_slug ) {
-				$pattern  = $patterns_for_category[ $pattern_slug ];
-				$response = wp_remote_post(
-					NFD_AI_BASE . 'generateSiteMeta',
-					array(
-						'headers' => array(
-							'Content-Type' => 'application/json',
-						),
-						'timeout' => 60,
-						'body'    => wp_json_encode(
-							array(
-								'hiivetoken' => HiiveConnection::get_auth_token(),
-								'prompt'     => array(
-									'pattern' => $pattern['content'],
-									'prompt'  => self::get_prompt_from_info(
-										array(
-											'site_description' => $site_description,
-											'keywords' => wp_json_encode( $keywords ),
-											'content_style' => wp_json_encode( $content_style ),
-											'target_audience' => wp_json_encode( $target_audience ),
-										)
-									),
-								),
-								'identifier' => 'contentRegenerate',
-							)
-						),
-					)
-				);
+				$pattern                = $patterns_for_category[ $pattern_slug ];
+				$pattern_parser         = new PatternParser( $pattern['content'] );
+				$pattern_representation = $pattern_parser->get_pattern_representation();
+				array_push( $category_content, $pattern_representation );
+				array_push( $category_patterns, $pattern_parser );
+				array_push( $category_base_patterns, $pattern['content'] );
+			}
+			$generated_content = wp_remote_post(
+				NFD_AI_BASE . 'generateSiteMeta',
+				array(
+					'headers' => array(
+						'Content-Type' => 'application/json',
+					),
+					'timeout' => 60,
+					'body'    => wp_json_encode(
+						array(
+							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'prompt'     => array(
+								'site_description' => $site_description,
+								'keywords'         => wp_json_encode( $keywords ),
+								'content_style'    => wp_json_encode( $content_style ),
+								'target_audience'  => wp_json_encode( $target_audience ),
+								'content'          => $category_content,
+							),
+							'identifier' => 'generateContent',
+						)
+					),
+				)
+			);
 
-				$parsed_response   = json_decode( wp_remote_retrieve_body( $response ), true );
-				$generated_pattern = $parsed_response['content'];
-				array_push( $category_pattern_map[ $category ], $generated_pattern );
+			$generated_content = json_decode( wp_remote_retrieve_body( $generated_content ), true );
+
+			if ( array_key_exists( 'content', $generated_content ) ) {
+				$generated_content = $generated_content['content'];
+			} else {
+				$generated_content = array();
+			}
+
+			$category_content_length = count( $category_content );
+			for ( $i = 0; $i < $category_content_length; $i++ ) {
+				if ( empty( $generated_content ) ) {
+					array_push( $category_pattern_map[ $category ], $category_base_patterns[ $i ] );
+				}
+				if ( array_key_exists( $i, $generated_content ) ) {
+					$generated_pattern = $category_patterns[ $i ]->get_replaced_pattern( $generated_content[ $i ] );
+					array_push( $category_pattern_map[ $category ], $generated_pattern );
+				} else {
+					array_push( $category_pattern_map[ $category ], $category_base_patterns[ $i ] );
+				}
 			}
 		}
 
