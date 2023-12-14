@@ -13,7 +13,7 @@ class AISearchUtil {
 	/**
 	 * The function to check capabilities for module AI
 	 */
-	private static function _check_capabilities( ) {
+	private static function check_capabilities() {
 		$capability = new SiteCapabilities();
 
 		$help_enabled = $capability->get( 'canAccessHelpCenter' );
@@ -25,10 +25,10 @@ class AISearchUtil {
 	/**
 	 * The function to check just Help capability
 	 */
-	private static function _check_help_capability() {
+	private static function check_help_capability() {
 		$capability = new SiteCapabilities();
 
-		$help_enabled = $capability->get('canAccessHelpCenter');
+		$help_enabled = $capability->get( 'canAccessHelpCenter' );
 
 		return $help_enabled;
 	}
@@ -43,10 +43,13 @@ class AISearchUtil {
 	 * @return array
 	 */
 	public static function get_search_results(
-		string $hiive_token, string $user_prompt, string $identifier, array $extra = null
+		string $hiive_token,
+		string $user_prompt,
+		string $identifier,
+		array $extra = null
 	) {
 
-		if ( !self::_check_capabilities() ) {
+		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'We are unable to process the request at this moment' ),
 			);
@@ -97,9 +100,9 @@ class AISearchUtil {
 	 * @return array
 	 */
 	public static function get_default_search_results( $hiive_token ) {
-		if (!self::_check_help_capability()) {
+		if ( ! self::check_help_capability() ) {
 			return array(
-				'error' => __('We are unable to process the request at this moment'),
+				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
 
@@ -120,7 +123,7 @@ class AISearchUtil {
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __('We are unable to process the request at this moment'),
+				'error' => __( 'We are unable to process the request at this moment' ),
 			);
 		}
 
