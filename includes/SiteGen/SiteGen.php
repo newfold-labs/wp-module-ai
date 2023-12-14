@@ -80,9 +80,9 @@ class SiteGen {
 	 * @param string $identifier The identifier to be used for generating the required meta
 	 */
 	private static function get_sitegen_from_cache( $identifier ) {
-		$site_gen = get_option( NFD_SITEGEN_OPTION, null );
+		$site_gen = get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), null );
 		if ( ! $site_gen ) {
-			update_option( NFD_SITEGEN_OPTION, array() );
+			update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), array() );
 		}
 		if ( $site_gen && array_key_exists( $identifier, $site_gen ) ) {
 			return $site_gen[ $identifier ];
@@ -97,9 +97,9 @@ class SiteGen {
 	 * @param array  $response   The response from the sitegen API.
 	 */
 	private static function cache_sitegen_response( $identifier, $response ) {
-		$site_gen                = get_option( NFD_SITEGEN_OPTION, array() );
+		$site_gen                = get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), array() );
 		$site_gen[ $identifier ] = $response;
-		update_option( NFD_SITEGEN_OPTION, $site_gen );
+		update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), $site_gen );
 	}
 
 	/**
