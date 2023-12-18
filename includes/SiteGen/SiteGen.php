@@ -357,7 +357,7 @@ class SiteGen {
 		}
 
 		$generated_content_structures = self::get_sitegen_from_cache(
-			'contentstructure'
+			'contentStructures'
 		);
 		$keywords                     = self::generate_site_meta(
 			array(
