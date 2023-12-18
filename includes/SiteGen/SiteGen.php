@@ -407,7 +407,6 @@ class SiteGen {
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
-			return $generated_homepages;
 		}
 
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
