@@ -341,16 +341,7 @@ class SiteGen {
 	 * @param array   $target_audience  Generated target audience.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = true ) {
-		$generated_content_structures = self::generate_site_meta(
-			array( 'site_description' => $site_description ),
-			'contentstructure'
-		);
-
-		// If we got an error, return that right away
-		if ( array_key_exists( 'error', $generated_content_structures ) ) {
-			return $generated_content_structures;
-		}
+	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
 
 		// Check if we have the response in cache already
 		if ( ! $regenerate ) {
@@ -359,14 +350,64 @@ class SiteGen {
 				return $generated_homepages;
 			}
 		}
+
+		$generated_content_structures = self::get_sitegen_from_cache(
+			'contentstructure'
+		);
+		$keywords                     = self::generate_site_meta(
+			array(
+				'site_description' => $site_description,
+				'content_style'    => $content_style,
+			),
+			'keywords'
+		);
+		if ( ! $generated_content_structures ) {
+			$response      = wp_remote_post(
+				NFD_AI_BASE . 'generatePageContent',
+				array(
+					'headers' => array(
+						'Content-Type' => 'application/json',
+					),
+					'timeout' => 60,
+					'body'    => wp_json_encode(
+						array(
+							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'prompt'     => array(
+								'site_description' => $site_description,
+								'keywords'         => wp_json_encode( $keywords ),
+								'content_style'    => wp_json_encode( $content_style ),
+								'target_audience'  => wp_json_encode( $target_audience ),
+							),
+							'page'       => 'home',
+						)
+					),
+				)
+			);
+			$response_code = wp_remote_retrieve_response_code( $response );
+			if ( 200 !== $response_code ) {
+				if ( 400 === $response_code ) {
+					$error = json_decode( wp_remote_retrieve_body( $response ), true );
+					return array(
+						'error' => $error['payload']['reason'],
+					);
+				}
+				return array(
+					'error' => __( 'We are unable to process the request at this moment' ),
+				);
+			}
+			$parsed_response              = json_decode( wp_remote_retrieve_body( $response ), true );
+			$generated_content_structures = $parsed_response['contentStructures'];
+			$generated_patterns           = $parsed_response['generatedPatterns'];
+			$generated_homepages          = $parsed_response['pages'];
+			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
+			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
+			self::cache_sitegen_response( 'homepages', $generated_homepages );
+			return $generated_homepages;
+		}
+
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
 		$generated_homepages = array();
-		$generated_patterns  = self::generate_pattern_content(
-			$site_description,
-			$content_style,
-			$target_audience,
-			$generated_content_structures
-		);
+		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
 		// Choose random categories for the generated patterns and return
 		foreach ( $random_homepages as $slug ) {
