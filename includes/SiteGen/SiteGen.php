@@ -342,6 +342,11 @@ class SiteGen {
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
 	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
+		if ( ! self::check_capabilities() ) {
+			return array(
+				'error' => __( 'You do not have the permissions to perform this action' ),
+			);
+		}
 
 		// Check if we have the response in cache already
 		if ( ! $regenerate ) {
