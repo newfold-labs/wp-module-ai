@@ -521,7 +521,7 @@ class SiteGen {
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 		if( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			$parsed_response['content'] = implode( ' ', $parsed_response['content'] );
+			$parsed_response['content'] = implode( '', $parsed_response['content'] );
 		}
 		return $parsed_response['content'];
 	}
