@@ -430,18 +430,27 @@ class SiteGen {
 		$generated_homepages = array();
 		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
+		$categories_to_separate = array('header', 'footer');
 		// Choose random categories for the generated patterns and return
 		foreach ( $random_homepages as $slug ) {
 			$generated_homepages[ $slug ] = array();
+			$homepage_patterns = array();
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
-				if ( ! $generated_patterns[ $pattern_category ] ) {
+				if ( ! isset( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
 				}
 				// Get a random pattern for the category.
 				$random_pattern = array_rand( $generated_patterns[ $pattern_category ] );
 				$random_pattern = $generated_patterns[ $pattern_category ][ $random_pattern ];
-				array_push( $generated_homepages[ $slug ], $random_pattern );
+
+				if( in_array( $pattern_category, $categories_to_separate ) ) {
+					$homepage_patterns[ $pattern_category ] = $random_pattern;
+				} else {
+					$homepage_patterns[ 'content' ] = $random_pattern;
+				}
+
 			}
+			$generated_homepages[ $slug ] = $homepage_patterns;
 		}
 
 		self::cache_sitegen_response( 'homepages', $generated_homepages );
