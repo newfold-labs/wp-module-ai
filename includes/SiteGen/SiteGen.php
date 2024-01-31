@@ -436,7 +436,7 @@ class SiteGen {
 			$generated_homepages[ $slug ] = array();
 			$homepage_patterns = array();
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
-				if ( ! isset( $generated_patterns[ $pattern_category ] ) ) {
+				if ( empty( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
 				}
 				// Get a random pattern for the category.
