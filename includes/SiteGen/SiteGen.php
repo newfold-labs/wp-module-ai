@@ -432,15 +432,16 @@ class SiteGen {
 
 		$categories_to_separate = array('header', 'footer');
 		// Choose random categories for the generated patterns and return
-		foreach ( $random_homepages as $slug ) {
+		foreach ( $random_homepages as $homepage_index => $slug ) {
 			$generated_homepages[ $slug ] = array();
 			$homepage_patterns = array();
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
 				if ( empty( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
 				}
-				// Get a random pattern for the category.
-				$random_pattern = array_rand( $generated_patterns[ $pattern_category ] );
+				// Get a random pattern for the category when regenerating otherwise pick in sequence
+				// so that the 3 previews are as different as much as possible.
+				$pattern_index = ( $regenerate ) ? array_rand( $generated_patterns[ $pattern_category ] ) : $homepage_index;
 				$random_pattern = $generated_patterns[ $pattern_category ][ $random_pattern ];
 
 				if( in_array( $pattern_category, $categories_to_separate ) ) {
