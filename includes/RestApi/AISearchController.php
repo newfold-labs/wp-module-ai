@@ -113,6 +113,36 @@ class AISearchController extends \WP_REST_Controller {
 				),
 			)
 		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/otherpages',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'other_pages' ),
+					'args'                => array(
+						'site_description' => array(
+							'required' => true,
+							'type'     => 'string',
+						),
+						'content_style'    => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+						'target_audience'  => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+						'sitemap'          => array(
+							'required' => true,
+							'type'     => 'object',
+						),
+					),
+					'permission_callback' => array( $this, 'check_permission' ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -144,6 +174,33 @@ class AISearchController extends \WP_REST_Controller {
 		$target_audience  = $request['target_audience'];
 
 		$response = SiteGen::get_home_pages( $site_description, $content_style, $target_audience );
+
+		if ( array_key_exists( 'error', $response ) ) {
+			return new \WP_Error( 'bad_request', $response['error'], 400 );
+		}
+
+		return new \WP_REST_Response( $response, 200 );
+	}
+
+	/**
+	 * Proxy to the AI service to get the responses.
+	 *
+	 * @param \WP_REST_Request $request Request object
+	 *
+	 * @returns \WP_REST_Response|\WP_Error
+	 */
+	public function other_pages( \WP_REST_Request $request ) {
+		$site_description = $request['site_description'];
+		$content_style    = $request['content_style'];
+		$target_audience  = $request['target_audience'];
+		$sitemap          = $request['sitemap'];
+
+		$response = SiteGen::get_pages(
+			$site_description,
+			$content_style,
+			$target_audience,
+			$sitemap
+		);
 
 		if ( array_key_exists( 'error', $response ) ) {
 			return new \WP_Error( 'bad_request', $response['error'], 400 );

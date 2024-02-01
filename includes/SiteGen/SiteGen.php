@@ -81,14 +81,7 @@ class SiteGen {
 	 * @param string $identifier The identifier to be used for generating the required meta
 	 */
 	private static function get_sitegen_from_cache( $identifier ) {
-		$site_gen = get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), null );
-		if ( ! $site_gen ) {
-			update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), array() );
-		}
-		if ( $site_gen && array_key_exists( $identifier, $site_gen ) ) {
-			return $site_gen[ $identifier ];
-		}
-		return null;
+		return get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), null );
 	}
 
 	/**
@@ -98,9 +91,7 @@ class SiteGen {
 	 * @param array  $response   The response from the sitegen API.
 	 */
 	private static function cache_sitegen_response( $identifier, $response ) {
-		$site_gen                = get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), array() );
-		$site_gen[ $identifier ] = $response;
-		update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), $site_gen );
+		update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), $response );
 	}
 
 	/**
@@ -314,9 +305,22 @@ class SiteGen {
 					'error' => $error['payload']['reason'],
 				);
 			}
-			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
-			);
+			try {
+				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+				if ( array_key_exists( 'payload', $error ) ) {
+					return array(
+						'error' => $error['payload'],
+					);
+				} else {
+					return array(
+						'error' => __( 'We are unable to process the request at this moment' ),
+					);
+				}
+			} catch ( \Exception $exception ) {
+				return array(
+					'error' => __( 'We are unable to process the request at this moment' ),
+				);
+			}
 		}
 
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -359,6 +363,9 @@ class SiteGen {
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
 		);
+		$generated_images             = self::get_sitegen_from_cache(
+			'generatedImages'
+		);
 		$keywords                     = self::generate_site_meta(
 			array(
 				'site_description' => $site_description,
@@ -396,14 +403,31 @@ class SiteGen {
 						'error' => $error['payload']['reason'],
 					);
 				}
-				return array(
-					'error' => __( 'We are unable to process the request at this moment' ),
-				);
+				try {
+					$error = json_decode( wp_remote_retrieve_body( $response ), true );
+					if ( array_key_exists( 'payload', $error ) ) {
+						return array(
+							'error' => $error['payload'],
+						);
+					} else {
+						return array(
+							'error' => __( 'We are unable to process the request at this moment' ),
+						);
+					}
+				} catch ( \Exception $exception ) {
+					return array(
+						'error' => __( 'We are unable to process the request at this moment' ),
+					);
+				}
 			}
 			$parsed_response              = json_decode( wp_remote_retrieve_body( $response ), true );
 			$generated_content_structures = $parsed_response['contentStructures'];
 			$generated_patterns           = $parsed_response['generatedPatterns'];
 			$generated_homepages          = $parsed_response['pages'];
+			if ( array_key_exists( "generatedImages", $parsed_response ) ) {
+				$generated_images = $parsed_response['generatedImages'];
+				self::cache_sitegen_response( 'generatedImages', $generated_images );
+			}
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
@@ -413,21 +437,151 @@ class SiteGen {
 		$generated_homepages = array();
 		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
+		$categories_to_separate = array('header', 'footer');
 		// Choose random categories for the generated patterns and return
-		foreach ( $random_homepages as $slug ) {
+		foreach ( $random_homepages as $homepage_index => $slug ) {
 			$generated_homepages[ $slug ] = array();
+			$homepage_patterns = array();
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
-				if ( ! $generated_patterns[ $pattern_category ] ) {
+				if ( empty( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
 				}
-				// Get a random pattern for the category.
-				$random_pattern = array_rand( $generated_patterns[ $pattern_category ] );
-				$random_pattern = $generated_patterns[ $pattern_category ][ $random_pattern ];
-				array_push( $generated_homepages[ $slug ], $random_pattern );
+				// Get a random pattern for the category when regenerating otherwise pick in sequence
+				// so that the 3 previews are as different as much as possible.
+				$pattern_index = ( $regenerate ) ? array_rand( $generated_patterns[ $pattern_category ] ) : $homepage_index;
+				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
+
+				if( in_array( $pattern_category, $categories_to_separate ) ) {
+					$homepage_patterns[ $pattern_category ] = $random_pattern;
+				} else {
+					$homepage_patterns[ 'content' ] = $random_pattern;
+				}
+
+			}
+			$generated_homepages[ $slug ] = $homepage_patterns;
+		}
+		
+		$generated_homepages['generatedImages'] = $generated_images;
+		self::cache_sitegen_response( 'homepages', $generated_homepages );
+		return $generated_homepages;
+	}
+
+	/**
+	 * Function to get the content for a page
+	 *
+	 * @param string $site_description The site description (user prompt).
+	 * @param array  $content_style    Generated from sitegen.
+	 * @param array  $target_audience  Generated target audience.
+	 * @param array  $keywords         Generated keywords for page.
+	 * @param string $page             The page
+	 */
+	public static function get_content_for_page(
+		$site_description,
+		$content_style,
+		$target_audience,
+		$keywords,
+		$page
+	) {
+		$response      = wp_remote_post(
+			NFD_AI_BASE . 'generatePageContent',
+			array(
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => 60,
+				'body'    => wp_json_encode(
+					array(
+						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'prompt'     => array(
+							'site_description' => $site_description,
+							'content_style'    => wp_json_encode( $content_style ),
+							'target_audience'  => wp_json_encode( $target_audience ),
+						),
+						'page'       => $page,
+						'keywords'   => wp_json_encode( $keywords ),
+					)
+				),
+			)
+		);
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			if ( 400 === $response_code ) {
+				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+				return array(
+					'error' => $error['payload']['reason'],
+				);
+			}
+			try {
+				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+				if ( isset( $error ) && array_key_exists( 'payload', $error ) ) {
+					return array(
+						'error' => $error['payload'],
+					);
+				} else {
+					return array(
+						'error' => __( 'We are unable to process the request at this moment' ),
+					);
+				}
+			} catch ( \Exception $exception ) {
+				return array(
+					'error' => __( 'We are unable to process the request at this moment' ),
+				);
+			}
+		}
+		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+		if( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
+			$parsed_response['content'] = implode( '', $parsed_response['content'] );
+		}
+		return $parsed_response['content'];
+	}
+
+	/**
+	 * Function to get the page patterns
+	 *
+	 * @param string  $site_description The site description (user prompt).
+	 * @param array   $content_style    Generated from sitegen.
+	 * @param array   $target_audience  Generated target audience.
+	 * @param array   $site_map         The site map
+	 * @param boolean $skip_cache       To skip or not to skip
+	 */
+	public static function get_pages(
+		$site_description,
+		$content_style,
+		$target_audience,
+		$site_map,
+		$skip_cache = false
+	) {
+		if ( ! self::check_capabilities() ) {
+			return array(
+				'error' => __( 'You do not have the permissions to perform this action' ),
+			);
+		}
+
+		$identifier = 'generatePages';
+
+		if ( ! $skip_cache ) {
+			$site_gen_cached = self::get_sitegen_from_cache( $identifier );
+			if ( $site_gen_cached ) {
+				return $site_gen_cached;
 			}
 		}
 
-		self::cache_sitegen_response( 'homepages', $generated_homepages );
-		return $generated_homepages;
+		$pages_content = array();
+
+		foreach ( $site_map as $site_menu => $site_menu_options ) {
+			$page     = $site_menu_options['slug'];
+			$keywords = $site_menu_options['keywords'];
+
+			$response = self::get_content_for_page(
+				$site_description,
+				$content_style,
+				$target_audience,
+				$keywords,
+				$page
+			);
+
+			$pages_content[ $page ] = $response;
+		}
+		return $pages_content;
 	}
 }
