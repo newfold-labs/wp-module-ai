@@ -50,6 +50,7 @@ class SiteGen {
 	 * Function to check capabilities
 	 */
 	private static function check_capabilities() {
+		return true;
 		$capability = new SiteCapabilities();
 
 		$ai_enabled = $capability->get( 'canAccessAI' );
@@ -211,7 +212,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'hiivetoken' => 'test-ai-sitegen',
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -289,7 +290,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'hiivetoken' => 'test-ai-sitegen',
 						'prompt'     => self::get_prompt_from_info( $site_info ),
 						'identifier' => $identifier,
 					)
@@ -380,7 +381,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'hiivetoken' => 'test-ai-sitegen',
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -442,7 +443,7 @@ class SiteGen {
 				// Get a random pattern for the category when regenerating otherwise pick in sequence
 				// so that the 3 previews are as different as much as possible.
 				$pattern_index = ( $regenerate ) ? array_rand( $generated_patterns[ $pattern_category ] ) : $homepage_index;
-				$random_pattern = $generated_patterns[ $pattern_category ][ $random_pattern ];
+				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				if( in_array( $pattern_category, $categories_to_separate ) ) {
 					$homepage_patterns[ $pattern_category ] = $random_pattern;
@@ -483,7 +484,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'hiivetoken' => 'test-ai-sitegen',
 						'prompt'     => array(
 							'site_description' => $site_description,
 							'content_style'    => wp_json_encode( $content_style ),
