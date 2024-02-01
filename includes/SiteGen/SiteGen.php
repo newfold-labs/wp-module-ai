@@ -363,6 +363,9 @@ class SiteGen {
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
 		);
+		$generated_images             = self::get_sitegen_from_cache(
+			'generatedImages'
+		);
 		$keywords                     = self::generate_site_meta(
 			array(
 				'site_description' => $site_description,
@@ -421,6 +424,10 @@ class SiteGen {
 			$generated_content_structures = $parsed_response['contentStructures'];
 			$generated_patterns           = $parsed_response['generatedPatterns'];
 			$generated_homepages          = $parsed_response['pages'];
+			if ( array_key_exists( "generatedImages", $parsed_response ) ) {
+				$generated_images = $parsed_response['generatedImages'];
+				self::cache_sitegen_response( 'generatedImages', $generated_images );
+			}
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
@@ -453,7 +460,8 @@ class SiteGen {
 			}
 			$generated_homepages[ $slug ] = $homepage_patterns;
 		}
-
+		
+		$generated_homepages['generatedImages'] = $generated_images;
 		self::cache_sitegen_response( 'homepages', $generated_homepages );
 		return $generated_homepages;
 	}
