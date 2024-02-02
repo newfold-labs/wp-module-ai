@@ -454,7 +454,7 @@ class SiteGen {
 				if ( in_array( $pattern_category, $categories_to_separate, true ) ) {
 					$homepage_patterns[ $pattern_category ] = $random_pattern;
 				} else {
-					$homepage_patterns['content'] = $random_pattern;
+					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern;
 				}
 			}
 			$generated_homepages[ $slug ] = $homepage_patterns;
