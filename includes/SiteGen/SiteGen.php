@@ -281,16 +281,6 @@ class SiteGen {
 			}
 		}
 
-		print_r(
-			wp_json_encode(
-				array(
-					'hiivetoken' => 'test-ai-sitegen',
-					'prompt'     => self::get_prompt_from_info( $site_info ),
-					'identifier' => $identifier,
-				)
-			)
-		);
-
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
 			array(
