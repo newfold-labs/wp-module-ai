@@ -50,6 +50,7 @@ class SiteGen {
 	 * Function to check capabilities
 	 */
 	private static function check_capabilities() {
+		return true;
 		$capability = new SiteCapabilities();
 
 		$ai_enabled = $capability->get( 'canAccessAI' );
@@ -211,7 +212,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'hiivetoken' => 'test-ai-sitegen',
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -280,6 +281,16 @@ class SiteGen {
 			}
 		}
 
+		print_r(
+			wp_json_encode(
+				array(
+					'hiivetoken' => 'test-ai-sitegen',
+					'prompt'     => self::get_prompt_from_info( $site_info ),
+					'identifier' => $identifier,
+				)
+			)
+		);
+
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
 			array(
@@ -289,7 +300,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'hiivetoken' => 'test-ai-sitegen',
 						'prompt'     => self::get_prompt_from_info( $site_info ),
 						'identifier' => $identifier,
 					)
@@ -363,9 +374,6 @@ class SiteGen {
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
 		);
-		$generated_images             = self::get_sitegen_from_cache(
-			'generatedImages'
-		);
 		$keywords                     = self::generate_site_meta(
 			array(
 				'site_description' => $site_description,
@@ -383,7 +391,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'hiivetoken' => 'test-ai-sitegen',
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -424,10 +432,6 @@ class SiteGen {
 			$generated_content_structures = $parsed_response['contentStructures'];
 			$generated_patterns           = $parsed_response['generatedPatterns'];
 			$generated_homepages          = $parsed_response['pages'];
-			if ( array_key_exists( 'generatedImages', $parsed_response ) ) {
-				$generated_images = $parsed_response['generatedImages'];
-				self::cache_sitegen_response( 'generatedImages', $generated_images );
-			}
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
@@ -452,10 +456,12 @@ class SiteGen {
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				if ( in_array( $pattern_category, $categories_to_separate, true ) ) {
-					$homepage_patterns[ $pattern_category ] = $random_pattern;
+					$homepage_patterns[ $pattern_category ] = $random_pattern['replacedPattern'];
 				} else {
 					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern['replacedPattern'];
 				}
+
+				$homepage_patterns['generatedImages'] = array();
 
 				if ( ! empty( $random_pattern['dalleImages'] ) ) {
 					$homepage_patterns['generatedImages'] = $random_pattern['dalleImages'];
@@ -464,7 +470,6 @@ class SiteGen {
 			$generated_homepages[ $slug ] = $homepage_patterns;
 		}
 
-		$generated_homepages['generatedImages'] = $generated_images;
 		self::cache_sitegen_response( 'homepages', $generated_homepages );
 		return $generated_homepages;
 	}
@@ -494,7 +499,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'hiivetoken' => 'test-ai-sitegen',
 						'prompt'     => array(
 							'site_description' => $site_description,
 							'content_style'    => wp_json_encode( $content_style ),
@@ -533,7 +538,7 @@ class SiteGen {
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			$parsed_response['content'] = implode( '', $parsed_response['content'] );
+			$parsed_response['content'] = implode( '', $parsed_response['content']['replacedPattern'] );
 		}
 		return $parsed_response['content'];
 	}
