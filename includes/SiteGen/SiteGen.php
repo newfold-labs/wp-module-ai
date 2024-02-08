@@ -454,7 +454,11 @@ class SiteGen {
 				if ( in_array( $pattern_category, $categories_to_separate, true ) ) {
 					$homepage_patterns[ $pattern_category ] = $random_pattern;
 				} else {
-					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern;
+					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern[''];
+				}
+
+				if ( ! empty( $random_pattern['dalleImages'] ) ) {
+					$homepage_patterns['generatedImages'] = $random_pattern['dalleImages'];
 				}
 			}
 			$generated_homepages[ $slug ] = $homepage_patterns;
