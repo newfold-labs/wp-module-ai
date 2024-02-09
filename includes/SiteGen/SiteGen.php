@@ -363,9 +363,6 @@ class SiteGen {
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
 		);
-		$generated_images             = self::get_sitegen_from_cache(
-			'generatedImages'
-		);
 		$keywords                     = self::generate_site_meta(
 			array(
 				'site_description' => $site_description,
@@ -424,10 +421,6 @@ class SiteGen {
 			$generated_content_structures = $parsed_response['contentStructures'];
 			$generated_patterns           = $parsed_response['generatedPatterns'];
 			$generated_homepages          = $parsed_response['pages'];
-			if ( array_key_exists( 'generatedImages', $parsed_response ) ) {
-				$generated_images = $parsed_response['generatedImages'];
-				self::cache_sitegen_response( 'generatedImages', $generated_images );
-			}
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
@@ -452,15 +445,20 @@ class SiteGen {
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				if ( in_array( $pattern_category, $categories_to_separate, true ) ) {
-					$homepage_patterns[ $pattern_category ] = $random_pattern;
+					$homepage_patterns[ $pattern_category ] = $random_pattern['replacedPattern'];
 				} else {
-					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern;
+					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern['replacedPattern'];
+				}
+
+				$homepage_patterns['generatedImages'] = array();
+
+				if ( ! empty( $random_pattern['dalleImages'] ) ) {
+					$homepage_patterns['generatedImages'] = $random_pattern['dalleImages'];
 				}
 			}
 			$generated_homepages[ $slug ] = $homepage_patterns;
 		}
 
-		$generated_homepages['generatedImages'] = $generated_images;
 		self::cache_sitegen_response( 'homepages', $generated_homepages );
 		return $generated_homepages;
 	}
@@ -528,10 +526,13 @@ class SiteGen {
 			}
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+		$generated_page  = '';
 		if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			$parsed_response['content'] = implode( '', $parsed_response['content'] );
+			foreach ( $parsed_response['content'] as $pattern_content ) {
+				$generated_page .= $pattern_content['replacedPattern'];
+			}
 		}
-		return $parsed_response['content'];
+		return $generated_page;
 	}
 
 	/**
