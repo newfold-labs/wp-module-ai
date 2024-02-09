@@ -526,9 +526,9 @@ class SiteGen {
 			}
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
-		$generated_page = '';
+		$generated_page  = '';
 		if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			foreach ($parsed_response['content'] as $pattern_content) {
+			foreach ( $parsed_response['content'] as $pattern_content ) {
 				$generated_page .= $pattern_content['replacedPattern'];
 			}
 		}
