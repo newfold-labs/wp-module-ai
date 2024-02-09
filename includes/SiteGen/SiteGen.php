@@ -50,7 +50,6 @@ class SiteGen {
 	 * Function to check capabilities
 	 */
 	private static function check_capabilities() {
-		return true;
 		$capability = new SiteCapabilities();
 
 		$ai_enabled = $capability->get( 'canAccessAI' );
@@ -212,7 +211,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => 'test-ai-sitegen',
+							'hiivetoken' => HiiveConnection::get_auth_token(),
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -290,7 +289,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => 'test-ai-sitegen',
+						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => self::get_prompt_from_info( $site_info ),
 						'identifier' => $identifier,
 					)
@@ -381,7 +380,7 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => 'test-ai-sitegen',
+							'hiivetoken' => HiiveConnection::get_auth_token(),
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -489,7 +488,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => 'test-ai-sitegen',
+						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => array(
 							'site_description' => $site_description,
 							'content_style'    => wp_json_encode( $content_style ),
@@ -527,10 +526,13 @@ class SiteGen {
 			}
 		}
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+		$generated_page = '';
 		if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			$parsed_response['content'] = implode( '', $parsed_response['content']['replacedPattern'] );
+			foreach ($parsed_response['content'] as $pattern_content) {
+				$generated_page .= $pattern_content['replacedPattern'];
+			}
 		}
-		return $parsed_response['content'];
+		return $generated_page;
 	}
 
 	/**
