@@ -44,6 +44,10 @@ class SiteGen {
 			'site_description',
 			'content_style',
 		),
+		'siteconfig'		   => array(
+			'site_description',
+		),
+
 	);
 
 	/**
@@ -326,6 +330,9 @@ class SiteGen {
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		self::cache_sitegen_response( $identifier, $parsed_response );
+
+		// calling the action hook for the identifiers
+		do_action( 'newfold/ai/sitemeta-'. strtolower( $identifier ) . ':generated', $parsed_response );
 
 		try {
 			return $parsed_response;
