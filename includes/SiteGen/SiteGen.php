@@ -332,7 +332,7 @@ class SiteGen {
 		self::cache_sitegen_response( $identifier, $parsed_response );
 
 		// calling the action hook for the identifiers
-		do_action( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ) , $parsed_response );
+		do_action( 'newfold/ai/sitemeta-'. strtolower( $identifier ) . ':generated', $parsed_response );
 
 		try {
 			return $parsed_response;
