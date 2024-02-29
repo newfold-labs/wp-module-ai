@@ -440,8 +440,9 @@ class SiteGen {
 		$categories_to_separate = array( 'header', 'footer' );
 		// Choose random categories for the generated patterns and return
 		foreach ( $random_homepages as $homepage_index => $slug ) {
-			$generated_homepages[ $slug ] = array();
-			$homepage_patterns            = array();
+			$generated_homepages[ $slug ]         = array();
+			$homepage_patterns                    = array();
+			$homepage_patterns['generatedImages'] = array();
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
 				if ( empty( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
@@ -456,8 +457,6 @@ class SiteGen {
 				} else {
 					$homepage_patterns['content'] = $homepage_patterns['content'] . $random_pattern['replacedPattern'];
 				}
-
-				$homepage_patterns['generatedImages'] = array();
 
 				if ( ! empty( $random_pattern['dalleImages'] ) ) {
 					$homepage_patterns['generatedImages'] = $random_pattern['dalleImages'];
