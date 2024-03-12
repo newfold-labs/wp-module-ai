@@ -56,7 +56,7 @@ class SiteGen {
 	private static function check_capabilities() {
 		$capability = new SiteCapabilities();
 
-		$ai_enabled = $capability->get( 'canAccessAI' );
+		$ai_enabled = $capability->get('hasAISiteGen');
 
 		return $ai_enabled;
 	}
