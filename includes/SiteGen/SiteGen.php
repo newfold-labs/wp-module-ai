@@ -44,7 +44,7 @@ class SiteGen {
 			'site_description',
 			'content_style',
 		),
-		'siteconfig'		   => array(
+		'siteconfig'           => array(
 			'site_description',
 		),
 
@@ -56,9 +56,10 @@ class SiteGen {
 	private static function check_capabilities() {
 		$capability = new SiteCapabilities();
 
-		$ai_enabled = $capability->get('hasAISiteGen');
+		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
+		$ai_enabled      = $capability->get( 'canAccessAI' );
 
-		return $ai_enabled;
+		return $sitegen_enabled && $ai_enabled;
 	}
 
 	/**
@@ -332,7 +333,7 @@ class SiteGen {
 		self::cache_sitegen_response( $identifier, $parsed_response );
 
 		// calling the action hook for the identifiers
-		do_action( 'newfold/ai/sitemeta-'. strtolower( $identifier ) . ':generated', $parsed_response );
+		do_action( 'newfold/ai/sitemeta-' . strtolower( $identifier ) . ':generated', $parsed_response );
 
 		try {
 			return $parsed_response;
