@@ -17,9 +17,8 @@ class AISearchUtil {
 		$capability = new SiteCapabilities();
 
 		$help_enabled = $capability->get( 'canAccessHelpCenter' );
-		$ai_enabled   = $capability->get( 'canAccessAI' );
 
-		return $help_enabled && $ai_enabled;
+		return $help_enabled;
 	}
 
 	/**

@@ -57,9 +57,8 @@ class SiteGen {
 		$capability = new SiteCapabilities();
 
 		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
-		$ai_enabled      = $capability->get( 'canAccessAI' );
 
-		return $sitegen_enabled && $ai_enabled;
+		return $sitegen_enabled;
 	}
 
 	/**
