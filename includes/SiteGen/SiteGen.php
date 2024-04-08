@@ -54,10 +54,8 @@ class SiteGen {
 	 * Function to check capabilities
 	 */
 	private static function check_capabilities() {
-		$capability = new SiteCapabilities();
-
+		$capability      = new SiteCapabilities();
 		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
-
 		return $sitegen_enabled;
 	}
 
@@ -426,8 +424,15 @@ class SiteGen {
 			}
 			$parsed_response              = json_decode( wp_remote_retrieve_body( $response ), true );
 			$generated_content_structures = $parsed_response['contentStructures'];
-			$generated_patterns           = $parsed_response['generatedPatterns'];
-			$generated_homepages          = $parsed_response['pages'];
+			// Ensure all content structures should have hero
+			foreach ( $generated_content_structures as $home_slug => $structure ) {
+				if ( ! in_array( 'hero', $structure, true ) ) {
+					array_splice( $structure, 1, 0, 'hero' );
+					$generated_content_structures[ $home_slug ] = $structure;
+				}
+			}
+			$generated_patterns  = $parsed_response['generatedPatterns'];
+			$generated_homepages = $parsed_response['pages'];
 			self::cache_sitegen_response( 'contentStructures', $generated_content_structures );
 			self::cache_sitegen_response( 'generatedPatterns', $generated_patterns );
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
@@ -437,6 +442,7 @@ class SiteGen {
 		$generated_homepages = array();
 		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
+		$dalle_used             = false;
 		$categories_to_separate = array( 'header', 'footer' );
 		// Choose random categories for the generated patterns and return
 		foreach ( $random_homepages as $homepage_index => $slug ) {
@@ -452,6 +458,16 @@ class SiteGen {
 				$pattern_index  = ( $regenerate ) ? array_rand( $generated_patterns[ $pattern_category ] ) : $homepage_index;
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
+				// Check if this is a hero pattern and we are at end of homepages without ever using dalle
+				if ( ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
+					// Chose the dalle hero only
+					foreach ( $generated_patterns[ $pattern_category ] as $gen_hero ) {
+						if ( ! empty( $gen_hero['dalleImages'] ) ) {
+							$random_pattern = $gen_hero;
+						}
+					}
+				}
+
 				if ( in_array( $pattern_category, $categories_to_separate, true ) ) {
 					$homepage_patterns[ $pattern_category ] = $random_pattern['replacedPattern'];
 				} else {
@@ -460,6 +476,7 @@ class SiteGen {
 
 				if ( ! empty( $random_pattern['dalleImages'] ) ) {
 					$homepage_patterns['generatedImages'] = $random_pattern['dalleImages'];
+					$dalle_used                           = true;
 				}
 			}
 			$generated_homepages[ $slug ] = $homepage_patterns;
