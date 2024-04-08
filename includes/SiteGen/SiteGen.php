@@ -459,7 +459,7 @@ class SiteGen {
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				// Check if this is a hero pattern and we are at end of homepages without ever using dalle
-				if ( ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
+				if ( ! $regenerate && ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
 					// Chose the dalle hero only
 					foreach ( $generated_patterns[ $pattern_category ] as $gen_hero ) {
 						if ( ! empty( $gen_hero['dalleImages'] ) ) {
