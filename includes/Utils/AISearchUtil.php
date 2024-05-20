@@ -80,6 +80,12 @@ class AISearchUtil {
 
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 
+		if ( isset( $parsed_response['status'] ) && 'Failure' === $parsed_response['status'] ) {
+			return array(
+				'error' => __( 'We are unable to process the request at this moment' ),
+			);
+		}
+
 		try {
 			return array(
 				'result'  => $parsed_response['payload']['choices'],
