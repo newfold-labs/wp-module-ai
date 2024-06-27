@@ -13,7 +13,12 @@ final class NFD_CLI {
 
 	/**
 	 * Enables and disables AI and AI Sitegen Capabilities.
-	 *
+	 * 
+	 * ## EXAMPLES
+	 * 
+	 * wp newfold ai enable <Hiive Token>
+	 * wp newfold ai disable🌞
+	 * 
 	 * @when after_wp_load
 	 */
 	public function ai( $args ) {
@@ -26,6 +31,9 @@ final class NFD_CLI {
 				self::disable();
 				break;
 			default:
+				WP_CLI::warning( "No action provided" );
+				WP_CLI::log( "Usage: wp newfold ai enable <Hiive Token>" );
+				WP_CLI::log( "       wp newfold ai disable" );
 				break;
 		}
 	}
