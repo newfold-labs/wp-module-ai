@@ -33,6 +33,12 @@ if ( function_exists( 'add_action' ) ) {
 					'isHidden' => true,
 				)
 			);
+
+			// Register the custom command with WP_CLI
+			if ( defined( '\\WP_CLI' ) && \WP_CLI ) {
+				require_once __DIR__ . '/includes/NFD_CLI.php';
+				WP_CLI::add_command( 'newfold', 'NFD_CLI' );
+			}
 		}
 	);
 
