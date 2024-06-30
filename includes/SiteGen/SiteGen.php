@@ -5,6 +5,7 @@ namespace NewfoldLabs\WP\Module\AI\SiteGen;
 use NewfoldLabs\WP\Module\AI\Utils\PatternParser;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 use NewfoldLabs\WP\Module\Data\SiteCapabilities;
+use NewfoldLabs\WP\Module\AI\Patterns;
 
 /**
  * The class to generate different parts of the site gen object.
@@ -438,9 +439,21 @@ class SiteGen {
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
 		}
 
+		$generated_patterns = self::get_sitegen_from_cache( 'generatedPatterns' );
+
+		// check if custom hero patterns needs to be added
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		if ( Patterns::check_custom_hero_needed( $site_classification ) ) {
+			// update content structures and generated patterns
+			$custom_structure = Patterns::get_custom_content_structure();
+			foreach ( $generated_content_structures as $home_slug => $structure ) {
+				$generated_content_structures[ $home_slug ] = $custom_structure;
+			}
+			$generated_patterns['hero-custom'] = array_pad( array(), 3, Patterns::get_custom_pattern() );
+		}
+
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
 		$generated_homepages = array();
-		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
 		$dalle_used             = false;
 		$categories_to_separate = array( 'header', 'footer' );
@@ -459,7 +472,7 @@ class SiteGen {
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				// Check if this is a hero pattern and we are at end of homepages without ever using dalle
-				if ( ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
+				if ( ! $dalle_used && count( $random_homepages ) === ( $homepage_index + 1 ) && 'hero' === $pattern_category ) {
 					// Chose the dalle hero only
 					foreach ( $generated_patterns[ $pattern_category ] as $gen_hero ) {
 						if ( ! empty( $gen_hero['dalleImages'] ) ) {
