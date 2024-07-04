@@ -443,13 +443,13 @@ class SiteGen {
 
 		// check if custom hero patterns needs to be added
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
-		if ( Patterns::check_custom_hero_needed( $site_classification ) ) {
+		if ( Patterns::check_custom_content_structure_needed( $site_classification ) ) {
 			// update content structures and generated patterns
 			$custom_structure = Patterns::get_custom_content_structure();
 			foreach ( $generated_content_structures as $home_slug => $structure ) {
 				$generated_content_structures[ $home_slug ] = $custom_structure;
 			}
-			$generated_patterns['hero-custom'] = array_pad( array(), 3, Patterns::get_custom_pattern() );
+			$generated_patterns['hero-custom'] = array_pad( array(), 3, Patterns::get_custom_hero_pattern() );
 		}
 
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
