@@ -103,7 +103,7 @@ class SiteGen {
 	 */
 	private static function get_refined_prompt( $prompt ) {
 		// Try and see if we have the refined propmt already
-		$refined_propmt = get_option( NFD_SITEGEN_OPTION . '-' . 'refined-prompt', false );
+		$refined_propmt = get_option( NFD_SITEGEN_OPTION . '-refined-prompt', false );
 		if ( $refined_propmt ) {
 			return $refined_propmt;
 		} else {
@@ -130,7 +130,7 @@ class SiteGen {
 			}
 
 			$prompt_response = json_decode( wp_remote_retrieve_body( $response ), true );
-			update_option( NFD_SITEGEN_OPTION . '-' . 'refined-prompt', $prompt_response );
+			update_option( NFD_SITEGEN_OPTION . '-refined-prompt', $prompt_response );
 			return $prompt_response;
 		}
 	}
