@@ -97,6 +97,45 @@ class SiteGen {
 	}
 
 	/**
+	 * Function to trim down the promopt when it excedes a certain number of tokens
+	 *
+	 * @param string $prompt The user prompt
+	 */
+	private static function get_refined_prompt( $prompt ) {
+		// Try and see if we have the refined propmt already
+		$refined_propmt = get_option( NFD_SITEGEN_OPTION . '-' . 'refined-prompt', false );
+		if ( $refined_propmt ) {
+			return $refined_propmt;
+		} else {
+			$response = wp_remote_post(
+				NFD_AI_BASE . 'refineSiteDescription',
+				array(
+					'headers' => array(
+						'Content-Type' => 'application/json',
+					),
+					'timeout' => 60,
+					'body'    => wp_json_encode(
+						array(
+							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'prompt'     => $prompt,
+						)
+					),
+				)
+			);
+
+			if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+				return array(
+					'error' => __( 'We are unable to process the request at this moment' ),
+				);
+			}
+
+			$prompt_response = json_decode( wp_remote_retrieve_body( $response ), true );
+			update_option( NFD_SITEGEN_OPTION . '-' . 'refined-prompt', $prompt_response );
+			return $prompt_response;
+		}
+	}
+
+	/**
 	 * Function to generate the prompt from the JSON input.
 	 *
 	 * @param array $site_info The JSON input for the sitegen call.
@@ -104,6 +143,9 @@ class SiteGen {
 	private static function get_prompt_from_info( $site_info ) {
 		$prompt = '';
 		foreach ( $site_info as $key => $value ) {
+			if ( 'site_description' === $key ) {
+				$value = self::get_refined_prompt( $value );
+			}
 			$prompt = $prompt . $key . ': ' . $value . ', ';
 		}
 		return $prompt;
@@ -163,6 +205,8 @@ class SiteGen {
 				return $generated_patterns;
 			}
 		}
+
+		$site_description = self::get_refined_prompt( $site_description );
 
 		$keywords = self::generate_site_meta(
 			array(
@@ -357,6 +401,8 @@ class SiteGen {
 			);
 		}
 
+		$site_description = self::get_refined_prompt( $site_description );
+
 		// Check if we have the response in cache already
 		if ( ! $regenerate ) {
 			$generated_homepages = self::get_sitegen_from_cache( 'homepages' );
@@ -502,7 +548,8 @@ class SiteGen {
 		$keywords,
 		$page
 	) {
-		$response      = wp_remote_post(
+		$site_description = self::get_refined_prompt( $site_description );
+		$response         = wp_remote_post(
 			NFD_AI_BASE . 'generatePageContent',
 			array(
 				'headers' => array(
@@ -523,7 +570,7 @@ class SiteGen {
 				),
 			)
 		);
-		$response_code = wp_remote_retrieve_response_code( $response );
+		$response_code    = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
 			if ( 400 === $response_code ) {
 				$error = json_decode( wp_remote_retrieve_body( $response ), true );
