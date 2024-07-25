@@ -48,7 +48,9 @@ class SiteGen {
 		'siteconfig'           => array(
 			'site_description',
 		),
-
+		'siteclassificationmapping'   => array(
+			'site_description',
+		),
 	);
 
 	/**
@@ -441,11 +443,21 @@ class SiteGen {
 
 		$generated_patterns = self::get_sitegen_from_cache( 'generatedPatterns' );
 
+		// fetch site classification mapping
+		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
+		if( ! $site_classification_mapping ) {
+			$site_classification_mapping = self::generate_site_meta( 
+				array(
+					'site_description' => $site_description,
+				),
+				'siteclassificationmapping'
+			);
+		}
 		// check if custom hero patterns needs to be added
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
-		if ( Patterns::check_custom_content_structure_needed( $site_classification ) ) {
+		if ( Patterns::check_hero_custom_content_structure_needed( $site_classification, $site_classification_mapping ) ) {
 			// update content structures and generated patterns
-			$custom_structure = Patterns::get_custom_content_structure();
+			$custom_structure = Patterns::get_hero_custom_content_structure();
 			foreach ( $generated_content_structures as $home_slug => $structure ) {
 				$generated_content_structures[ $home_slug ] = $custom_structure;
 			}

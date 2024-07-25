@@ -11,7 +11,7 @@ final class Patterns {
 	 *
 	 * @return array
 	 */
-	public static function get_custom_content_structure() {
+	public static function get_hero_custom_content_structure() {
 		return array( 'header', 'hero-custom', 'footer' );
 	}
 
@@ -21,176 +21,14 @@ final class Patterns {
 	 * @param array $site_classification site classification as determined by AI
 	 * @return array|boolean
 	 */
-	public static function check_custom_content_structure_needed( $site_classification ) {
+	public static function check_hero_custom_content_structure_needed( $site_classification, $site_classification_mapping ) {
 		$primary_sitetype               = $site_classification['primaryType'];
 		$secondary_sitetype             = $site_classification['slug'];
-		$sitetypes_for_simpler_homepage = self::get_sitetypes_for_simpler_homepage();
 
-		if ( isset( $sitetypes_for_simpler_homepage[ $primary_sitetype ][ $secondary_sitetype ] ) ) {
-			return $sitetypes_for_simpler_homepage[ $primary_sitetype ][ $secondary_sitetype ];
+		if ( isset( $site_classification_mapping[ 'hero-custom' ][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
+			return $site_classification_mapping[ 'hero-custom' ][ $primary_sitetype ][ $secondary_sitetype ];
 		}
 		return false;
-	}
-
-	/**
-	 * List of primary and secondary sitetype.
-	 *
-	 * @return array
-	 */
-	public static function get_sitetypes_for_simpler_homepage() {
-		$sitetypes_for_simpler_homepage = array(
-			'business'            => array(
-				'agency-consulting'      => false,
-				'autos-repair'           => false,
-				'arts-crafts'            => false,
-				'child-care'             => false,
-				'events'                 => false,
-				'finance'                => false,
-				'garden-florist'         => false,
-				'insurance'              => false,
-				'trades-repair-services' => false,
-				'hr-recruiting'          => false,
-				'legal'                  => false,
-				'marketing'              => false,
-				'pr-communications'      => false,
-				'real-estate-management' => false,
-				'outdoors'               => false,
-				'shopping-retail'        => false,
-				'weddings'               => false,
-				'other'                  => false,
-			),
-			'creative'            => array(
-				'artist'          => true,
-				'cosplay'         => true,
-				'digital-creator' => true,
-				'influencer'      => true,
-				'model'           => true,
-				'photogrpahy'     => true,
-				'writing'         => false,
-				'other'           => true,
-			),
-			'education'           => array(
-				'after-school'         => false,
-				'driving-schools'      => false,
-				'online-courses'       => false,
-				'schools-universities' => false,
-				'student-organization' => false,
-				'teacher'              => true,
-				'tutoring'             => false,
-				'test-preparation'     => false,
-				'other'                => false,
-			),
-			'entertainment'       => array(
-				'comedy'            => false,
-				'dance-theater'     => false,
-				'film-tv'           => false,
-				'gaming-e-sports'   => false,
-				'video-streaming'   => false,
-				'live-events'       => false,
-				'music'             => false,
-				'publishing-media'  => false,
-				'radio-podcasts'    => true,
-				'talent-management' => false,
-				'other'             => true,
-			),
-			'government-politics' => array(
-				'activism-advocacy'    => false,
-				'emergency-relief'     => false,
-				'judiciary'            => false,
-				'law-enforcement'      => false,
-				'libraries'            => false,
-				'military-veterans'    => false,
-				'policy-campaigns'     => false,
-				'politicians'          => false,
-				'public-services'      => false,
-				'towns-cities-regions' => false,
-				'other'                => false,
-			),
-			'food-beverage'       => array(
-				'bars'            => false,
-				'bakeries'        => false,
-				'catering'        => false,
-				'chefs'           => false,
-				'coffee-tea'      => false,
-				'farms'           => false,
-				'food-trucks'     => false,
-				'grocers-markets' => false,
-				'recipes'         => false,
-				'other'           => false,
-			),
-			'fashion-beauty'      => array(
-				'accessories'       => false,
-				'clothing'          => false,
-				'fragrances'        => false,
-				'haircare'          => false,
-				'jewelry'           => false,
-				'makeup-skincare'   => false,
-				'nailcare'          => false,
-				'shoes'             => false,
-				'stylists'          => true,
-				'tattoos-piercings' => false,
-				'other'             => false,
-			),
-			'health-wellness'     => array(
-				'counseling-mental-health' => false,
-				'dentist-ortho'            => false,
-				'doctor'                   => false,
-				'gym'                      => false,
-				'trainer'                  => true,
-				'nutrition-weight-loss'    => true,
-				'physical-therapist'       => true,
-				'retreats'                 => false,
-				'spas'                     => false,
-				'spirituality'             => false,
-				'other'                    => false,
-			),
-			'nonprofit'           => array(
-				'animals-wildlife'           => false,
-				'climate-environment'        => false,
-				'civic-community-groups'     => false,
-				'diversity-equity-inclusion' => false,
-				'foundations'                => false,
-				'military-veterans'          => false,
-				'museums'                    => false,
-				'religious-groups'           => false,
-				'trade-professional-groups'  => false,
-			),
-			'personal'            => array(
-				'art'                => true,
-				'blog'               => false,
-				'creative-portfolio' => true,
-				'digital-creator'    => true,
-				'influencer'         => true,
-				'model'              => true,
-				'photography'        => true,
-				'writing'            => false,
-				'wedding'            => false,
-				'other'              => true,
-			),
-			'tech'                => array(
-				'agency-consulting'  => false,
-				'apps-software'      => false,
-				'blockchain'         => false,
-				'edutech'            => false,
-				'fintech'            => false,
-				'hardware-wearables' => false,
-				'social-communities' => false,
-				'services-saas'      => false,
-				'other'              => false,
-			),
-			'travel-tourism'      => array(
-				'attractions'         => false,
-				'hotels-lodging'      => false,
-				'property-management' => false,
-				'tours-guides'        => false,
-				'rentals'             => false,
-				'travel-agency'       => false,
-				'travel-influencer'   => false,
-				'other'               => false,
-			),
-		);
-
-		return $sitetypes_for_simpler_homepage;
 	}
 
 	/**
