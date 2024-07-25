@@ -17,38 +17,38 @@ class SiteGen {
 	 * @var array
 	 */
 	private static $required_validations = array(
-		'siteclassification'   => array(
+		'siteclassification'        => array(
 			'site_description',
 		),
-		'targetaudience'       => array(
+		'targetaudience'            => array(
 			'site_description',
 		),
-		'contenttones'         => array(
+		'contenttones'              => array(
 			'site_description',
 		),
-		'contentstructure'     => array(
+		'contentstructure'          => array(
 			'site_description',
 		),
-		'colorpalette'         => array(
+		'colorpalette'              => array(
 			'site_description',
 		),
-		'sitemap'              => array(
+		'sitemap'                   => array(
 			'site_description',
 		),
-		'pluginrecommendation' => array(
+		'pluginrecommendation'      => array(
 			'site_description',
 		),
-		'fontpair'             => array(
+		'fontpair'                  => array(
 			'site_description',
 		),
-		'keywords'             => array(
+		'keywords'                  => array(
 			'site_description',
 			'content_style',
 		),
-		'siteconfig'           => array(
+		'siteconfig'                => array(
 			'site_description',
 		),
-		'siteclassificationmapping'   => array(
+		'siteclassificationmapping' => array(
 			'site_description',
 		),
 	);
@@ -445,8 +445,8 @@ class SiteGen {
 
 		// fetch site classification mapping
 		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
-		if( ! $site_classification_mapping ) {
-			$site_classification_mapping = self::generate_site_meta( 
+		if ( ! $site_classification_mapping ) {
+			$site_classification_mapping = self::generate_site_meta(
 				array(
 					'site_description' => $site_description,
 				),

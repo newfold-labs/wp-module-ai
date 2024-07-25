@@ -19,14 +19,15 @@ final class Patterns {
 	 * Check whether custom hero to be used or not.
 	 *
 	 * @param array $site_classification site classification as determined by AI
+	 * @param array $site_classification_mapping site classification mapping for which the home page pattern needs to be overridden
 	 * @return array|boolean
 	 */
 	public static function check_hero_custom_content_structure_needed( $site_classification, $site_classification_mapping ) {
-		$primary_sitetype               = $site_classification['primaryType'];
-		$secondary_sitetype             = $site_classification['slug'];
+		$primary_sitetype   = $site_classification['primaryType'];
+		$secondary_sitetype = $site_classification['slug'];
 
-		if ( isset( $site_classification_mapping[ 'hero-custom' ][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
-			return $site_classification_mapping[ 'hero-custom' ][ $primary_sitetype ][ $secondary_sitetype ];
+		if ( isset( $site_classification_mapping['hero-custom'][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
+			return $site_classification_mapping['hero-custom'][ $primary_sitetype ][ $secondary_sitetype ];
 		}
 		return false;
 	}
