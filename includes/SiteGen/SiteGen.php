@@ -527,6 +527,34 @@ class SiteGen {
 		$keywords,
 		$page
 	) {
+		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
+		if ( ! $site_classification_mapping ) {
+			$site_classification_mapping = self::generate_site_meta(
+				array(
+					'site_description' => $site_description,
+				),
+				'siteclassificationmapping'
+			);
+		}
+
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		if ( Patterns::check_custom_menu_needed( $site_classification, $site_classification_mapping, $page ) ) {
+			$menu_patterns = self::get_patterns_for_category( $page );
+			if ( ! $menu_patterns['error'] ) {
+				$menu_patterns_slugs      = Patterns::get_custom_menu_slugs();
+				$menu_patterns_filtered   = array_filter(
+					$menu_patterns,
+					function ( $key ) use ( $menu_patterns_slugs ) {
+						return in_array( $key, $menu_patterns_slugs, true );
+					},
+					ARRAY_FILTER_USE_KEY
+				);
+				$random_menu_pattern_slug = array_rand( $menu_patterns_filtered );
+
+				return $menu_patterns_filtered[ $random_menu_pattern_slug ];
+			}
+		}
+
 		$response      = wp_remote_post(
 			NFD_AI_BASE . 'generatePageContent',
 			array(
