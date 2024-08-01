@@ -116,10 +116,20 @@ class SiteGen {
 	 * Get the patterns for a particular category.
 	 *
 	 * @param string $category The category to get patterns for.
+	 * @param array  $site_classification site classification as determined by AI.
 	 */
-	private static function get_patterns_for_category( $category ) {
+	private static function get_patterns_for_category( $category, $site_classification = array() ) {
+		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
+		$secondary_sitetype = isset( $site_classification['slug'] ) ? $site_classification['slug'] : null;
+		$args               = array(
+			'category'       => $category,
+			'primary_type'   => $primary_sitetype,
+			'secondary_type' => $secondary_sitetype,
+		);
+		$api                = NFD_PATTERNS_BASE . 'patterns?' . http_build_query( $args );
+
 		$response = wp_remote_get(
-			NFD_PATTERNS_BASE . 'patterns?category=' . $category,
+			$api,
 			array(
 				'headers' => array(
 					'Content-Type' => 'application/json',
@@ -539,7 +549,7 @@ class SiteGen {
 
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
 		if ( Patterns::check_custom_menu_needed( $site_classification, $site_classification_mapping, $page ) ) {
-			$menu_patterns = self::get_patterns_for_category( $page );
+			$menu_patterns = self::get_patterns_for_category( $page, $site_classification );
 			if ( ! $menu_patterns['error'] ) {
 				$menu_patterns_slugs      = Patterns::get_custom_menu_slugs();
 				$menu_patterns_filtered   = array_filter(
@@ -551,7 +561,7 @@ class SiteGen {
 				);
 				$random_menu_pattern_slug = array_rand( $menu_patterns_filtered );
 
-				return $menu_patterns_filtered[ $random_menu_pattern_slug ];
+				return $menu_patterns_filtered[ $random_menu_pattern_slug ]['content'];
 			}
 		}
 
