@@ -5,6 +5,7 @@ namespace NewfoldLabs\WP\Module\AI\SiteGen;
 use NewfoldLabs\WP\Module\AI\Utils\PatternParser;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 use NewfoldLabs\WP\Module\Data\SiteCapabilities;
+use NewfoldLabs\WP\Module\AI\Patterns;
 
 /**
  * The class to generate different parts of the site gen object.
@@ -16,38 +17,40 @@ class SiteGen {
 	 * @var array
 	 */
 	private static $required_validations = array(
-		'siteclassification'   => array(
+		'siteclassification'        => array(
 			'site_description',
 		),
-		'targetaudience'       => array(
+		'targetaudience'            => array(
 			'site_description',
 		),
-		'contenttones'         => array(
+		'contenttones'              => array(
 			'site_description',
 		),
-		'contentstructure'     => array(
+		'contentstructure'          => array(
 			'site_description',
 		),
-		'colorpalette'         => array(
+		'colorpalette'              => array(
 			'site_description',
 		),
-		'sitemap'              => array(
+		'sitemap'                   => array(
 			'site_description',
 		),
-		'pluginrecommendation' => array(
+		'pluginrecommendation'      => array(
 			'site_description',
 		),
-		'fontpair'             => array(
+		'fontpair'                  => array(
 			'site_description',
 		),
-		'keywords'             => array(
+		'keywords'                  => array(
 			'site_description',
 			'content_style',
 		),
-		'siteconfig'           => array(
+		'siteconfig'                => array(
 			'site_description',
 		),
-
+		'siteclassificationmapping' => array(
+			'site_description',
+		),
 	);
 
 	/**
@@ -438,9 +441,31 @@ class SiteGen {
 			self::cache_sitegen_response( 'homepages', $generated_homepages );
 		}
 
+		$generated_patterns = self::get_sitegen_from_cache( 'generatedPatterns' );
+
+		// fetch site classification mapping
+		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
+		if ( ! $site_classification_mapping ) {
+			$site_classification_mapping = self::generate_site_meta(
+				array(
+					'site_description' => $site_description,
+				),
+				'siteclassificationmapping'
+			);
+		}
+		// check if custom hero patterns needs to be added
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		if ( Patterns::check_hero_custom_content_structure_needed( $site_classification, $site_classification_mapping ) ) {
+			// update content structures and generated patterns
+			$custom_structure = Patterns::get_hero_custom_content_structure();
+			foreach ( $generated_content_structures as $home_slug => $structure ) {
+				$generated_content_structures[ $home_slug ] = $custom_structure;
+			}
+			$generated_patterns['hero-custom'] = array_pad( array(), 3, Patterns::get_custom_hero_pattern() );
+		}
+
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
 		$generated_homepages = array();
-		$generated_patterns  = self::get_sitegen_from_cache( 'generatedPatterns' );
 
 		$dalle_used             = false;
 		$categories_to_separate = array( 'header', 'footer' );
@@ -459,7 +484,7 @@ class SiteGen {
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
 
 				// Check if this is a hero pattern and we are at end of homepages without ever using dalle
-				if ( ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
+				if ( ! $dalle_used && count( $random_homepages ) === ( $homepage_index + 1 ) && 'hero' === $pattern_category ) {
 					// Chose the dalle hero only
 					foreach ( $generated_patterns[ $pattern_category ] as $gen_hero ) {
 						if ( ! empty( $gen_hero['dalleImages'] ) ) {
