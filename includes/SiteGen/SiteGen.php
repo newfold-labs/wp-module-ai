@@ -344,7 +344,7 @@ class SiteGen {
 
 		if ( 'siteclassification' === $identifier ) {
 			// If the user is a writer or a blogger.
-			if( 'blog' ===  $parsed_response['slug'] ) {
+			if ( 'blog' === $parsed_response['slug'] ) {
 				$site_posts = wp_remote_post(
 					NFD_AI_BASE . 'generateSitePosts',
 					array(
@@ -355,14 +355,14 @@ class SiteGen {
 						'body'    => wp_json_encode(
 							array(
 								'hiivetoken' => HiiveConnection::get_auth_token(),
-								'prompt'     => self::get_prompt_from_info( $site_info )
+								'prompt'     => self::get_prompt_from_info( $site_info ),
 							)
 						),
 					)
 				);
 
 				$site_posts_response_code = wp_remote_retrieve_response_code( $site_posts );
-				$parsed_site_posts = json_decode( wp_remote_retrieve_body( $site_posts ), true );
+				$parsed_site_posts        = json_decode( wp_remote_retrieve_body( $site_posts ), true );
 				if ( 200 === $site_posts_response_code ) {
 					self::cache_sitegen_response( 'site-posts', $parsed_site_posts );
 				}
