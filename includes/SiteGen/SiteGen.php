@@ -160,9 +160,18 @@ class SiteGen {
 	 *
 	 * @param string $category The category to get templates for.
 	 */
-	private static function get_templates_for_category( $category ) {
+	private static function get_templates_for_category( $category, $site_classification = array() ) {
+		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
+		$secondary_sitetype = isset( $site_classification['slug'] ) ? $site_classification['slug'] : null;
+		$args               = array(
+			'category'       => $category,
+			'primary_type'   => $primary_sitetype,
+			'secondary_type' => $secondary_sitetype,
+		);
+		$api_url = NFD_PATTERNS_BASE . 'templates?' . http_build_query( $args );
+
 		$response = wp_remote_get(
-			NFD_PATTERNS_BASE . 'templates?category=' . $category,
+			$api_url,
 			array(
 				'headers' => array(
 					'Content-Type' => 'application/json',
@@ -602,7 +611,7 @@ class SiteGen {
 		// also make sure the jetpack plugin is installed and active
 		// then activate "contact-form" module since some templates use jetpack forms
 		if ( 'contact' === $page ) {
-			$contact_page_templates = self::get_templates_for_category( $page );
+			$contact_page_templates = self::get_templates_for_category( $page, $site_classification );
 			// templates fetched successfully
 			if ( ! isset( $contact_page_templates['error'] ) ) {
 				$random_contact_page_template_slug = array_rand( $contact_page_templates, 1 );
