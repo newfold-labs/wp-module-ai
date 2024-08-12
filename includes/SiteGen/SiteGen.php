@@ -141,7 +141,7 @@ class SiteGen {
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -159,6 +159,7 @@ class SiteGen {
 	 * Get the templates for a particular category.
 	 *
 	 * @param string $category The category to get templates for.
+	 * @param array  $site_classification site classification as determined by AI.
 	 */
 	private static function get_templates_for_category( $category, $site_classification = array() ) {
 		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
@@ -168,7 +169,7 @@ class SiteGen {
 			'primary_type'   => $primary_sitetype,
 			'secondary_type' => $secondary_sitetype,
 		);
-		$api_url = NFD_PATTERNS_BASE . 'templates?' . http_build_query( $args );
+		$api_url            = NFD_PATTERNS_BASE . 'templates?' . http_build_query( $args );
 
 		$response = wp_remote_get(
 			$api_url,
@@ -182,7 +183,7 @@ class SiteGen {
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
