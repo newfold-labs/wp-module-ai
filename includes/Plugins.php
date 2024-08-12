@@ -36,7 +36,7 @@ final class Plugins {
 			'/jetpack/v4/settings'
 		);
 		$request->set_header( 'Content-Type', 'application/json' );
-		$request->set_body( \wp_json_encode( array( $module => true ) ) );
+		$request->set_body( wp_json_encode( array( $module => true ) ) );
 		$response = \rest_do_request( $request );
 
 		if ( 200 !== $response->status ) {
