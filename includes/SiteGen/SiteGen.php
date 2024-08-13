@@ -6,7 +6,8 @@ use NewfoldLabs\WP\Module\AI\Utils\PatternParser;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 use NewfoldLabs\WP\Module\Data\SiteCapabilities;
 use NewfoldLabs\WP\Module\AI\Patterns;
-use NewfoldLabs\WP\Module\AI\Plugins;
+use NewfoldLabs\WP\Module\Installer\Services\PluginInstaller;
+use NewfoldLabs\WP\Module\Installer\Data\Plugins;
 
 /**
  * The class to generate different parts of the site gen object.
@@ -619,7 +620,7 @@ class SiteGen {
 				$contact_page_content              = $contact_page_templates[ $random_contact_page_template_slug ]['content'];
 
 				// install and activate the Jetpack plugin and enable the "contact-form" module
-				if ( Plugins::install( 'jetpack' ) && Plugins::activate_jetpack_module( 'contact-form' ) ) {
+				if ( PluginInstaller::install( 'jetpack', true ) && Plugins::toggle_jetpack_module( 'contact-form', true ) ) {
 					// return contact page
 					return $contact_page_content;
 				}
