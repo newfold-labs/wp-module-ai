@@ -356,7 +356,7 @@ class SiteGen {
 							array(
 								'hiivetoken' => HiiveConnection::get_auth_token(),
 								'prompt'     => self::get_prompt_from_info( $site_info ),
-								'identifier' => "generateSitePosts",
+								'identifier' => 'generateSitePosts',
 							)
 						),
 					)
