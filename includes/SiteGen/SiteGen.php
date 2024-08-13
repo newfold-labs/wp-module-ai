@@ -346,7 +346,7 @@ class SiteGen {
 			// If the user is a writer or a blogger.
 			if ( 'blog' === $parsed_response['slug'] ) {
 				$site_posts = wp_remote_post(
-					NFD_AI_BASE . 'generateSitePosts',
+					NFD_AI_BASE . 'generateSiteMeta',
 					array(
 						'headers' => array(
 							'Content-Type' => 'application/json',
@@ -356,6 +356,7 @@ class SiteGen {
 							array(
 								'hiivetoken' => HiiveConnection::get_auth_token(),
 								'prompt'     => self::get_prompt_from_info( $site_info ),
+								'identifier' => "generateSitePosts",
 							)
 						),
 					)
