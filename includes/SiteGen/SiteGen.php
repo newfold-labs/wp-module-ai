@@ -311,11 +311,10 @@ class SiteGen {
 				'post_status'  => 'publish',
 				'post_title'   => $post_data['title'],
 				'post_content' => $post_data['content'],
-				'post_date'    => date( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
+				'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
 			);
 			\wp_insert_post( $post );
 		}
-
 	}
 
 	/**
