@@ -271,7 +271,7 @@ class SiteGen {
 	/**
 	 * Function to generate the site meta according to the arguments passed
 	 *
-	 * @param array   $site_info  The Site Info object, will be validated for required params.
+	 * @param array $site_info  The Site Info object, will be validated for required params.
 	 */
 	public static function generate_site_posts( $site_info ) {
 
@@ -294,26 +294,29 @@ class SiteGen {
 		);
 
 		$site_posts_response_code = wp_remote_retrieve_response_code( $site_posts );
-		$site_posts        = json_decode( wp_remote_retrieve_body( $site_posts ), true );
+		$site_posts               = json_decode( wp_remote_retrieve_body( $site_posts ), true );
+
 		if ( 200 === $site_posts_response_code ) {
+			// If the posts were not created or enough posts were not created
+			if ( ! isset( $site_posts['posts'] ) || count( $site_posts['posts'] ) < 6 ) {
+				return false;
+			}
 			// Save Post Content in wp_options
 			self::cache_sitegen_response( 'site-posts', $site_posts );
 		}
 
+		$idx        = 0;
 		$post_dates = array( '3', '5', '10', '12', '17', '19' );
-		foreach ( $site_posts as $post_title => $post_content ) {
+		foreach ( $site_posts['posts'] as $post_title => $post_content ) {
 			$post = array(
 				'post_title'   => $post_title,
 				'post_status'  => 'publish',
 				'post_content' => $post_content,
 				'post_type'    => 'page',
+				'post_date'    => date( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
 			);
-			echo "\n\n";
-			print_r(json_encode($post));
-			echo "\n\n";
-			echo date( 'Y-m-d H:i:s', strtotime( 'last sunday -'. $post_dates[5].' days' ) );
-			echo "\n\n";
-			// \wp_insert_post( $post );
+			$idx++;
+			\wp_insert_post( $post );
 		}
 
 	}
@@ -338,12 +341,12 @@ class SiteGen {
 			);
 		}
 
-		if ( ! $skip_cache ) {
-			$site_gen_cached = self::get_sitegen_from_cache( $identifier );
-			if ( $site_gen_cached ) {
-				return $site_gen_cached;
-			}
-		}
+		// if ( ! $skip_cache ) {
+		// $site_gen_cached = self::get_sitegen_from_cache( $identifier );
+		// if ( $site_gen_cached ) {
+		// return $site_gen_cached;
+		// }
+		// }
 
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
