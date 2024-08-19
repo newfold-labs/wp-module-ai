@@ -272,6 +272,56 @@ class SiteGen {
 	 * Function to generate the site meta according to the arguments passed
 	 *
 	 * @param array   $site_info  The Site Info object, will be validated for required params.
+	 */
+	public static function generate_site_posts( $site_info ) {
+
+		// Generate AI Post Title and Content
+		$site_posts = wp_remote_post(
+			NFD_AI_BASE . 'generateSiteMeta',
+			array(
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => 60,
+				'body'    => wp_json_encode(
+					array(
+						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'prompt'     => self::get_prompt_from_info( $site_info ),
+						'identifier' => 'generateSitePosts',
+					)
+				),
+			)
+		);
+
+		$site_posts_response_code = wp_remote_retrieve_response_code( $site_posts );
+		$site_posts        = json_decode( wp_remote_retrieve_body( $site_posts ), true );
+		if ( 200 === $site_posts_response_code ) {
+			// Save Post Content in wp_options
+			self::cache_sitegen_response( 'site-posts', $site_posts );
+		}
+
+		$post_dates = array( '3', '5', '10', '12', '17', '19' );
+		foreach ( $site_posts as $post_title => $post_content ) {
+			$post = array(
+				'post_title'   => $post_title,
+				'post_status'  => 'publish',
+				'post_content' => $post_content,
+				'post_type'    => 'page',
+			);
+			echo "\n\n";
+			print_r(json_encode($post));
+			echo "\n\n";
+			echo date( 'Y-m-d H:i:s', strtotime( 'last sunday -'. $post_dates[5].' days' ) );
+			echo "\n\n";
+			// \wp_insert_post( $post );
+		}
+
+	}
+
+	/**
+	 * Function to generate the site meta according to the arguments passed
+	 *
+	 * @param array   $site_info  The Site Info object, will be validated for required params.
 	 * @param string  $identifier The identifier for generating the site meta
 	 * @param boolean $skip_cache To skip returning the response from cache
 	 */
@@ -345,28 +395,7 @@ class SiteGen {
 		if ( 'siteclassification' === $identifier ) {
 			// If the user is a writer or a blogger.
 			if ( 'blog' === $parsed_response['slug'] ) {
-				$site_posts = wp_remote_post(
-					NFD_AI_BASE . 'generateSiteMeta',
-					array(
-						'headers' => array(
-							'Content-Type' => 'application/json',
-						),
-						'timeout' => 60,
-						'body'    => wp_json_encode(
-							array(
-								'hiivetoken' => HiiveConnection::get_auth_token(),
-								'prompt'     => self::get_prompt_from_info( $site_info ),
-								'identifier' => 'generateSitePosts',
-							)
-						),
-					)
-				);
-
-				$site_posts_response_code = wp_remote_retrieve_response_code( $site_posts );
-				$parsed_site_posts        = json_decode( wp_remote_retrieve_body( $site_posts ), true );
-				if ( 200 === $site_posts_response_code ) {
-					self::cache_sitegen_response( 'site-posts', $parsed_site_posts );
-				}
+				self::generate_site_posts( $site_info );
 			}
 		}
 
