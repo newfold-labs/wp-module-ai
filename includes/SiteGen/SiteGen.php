@@ -309,7 +309,6 @@ class SiteGen {
 		foreach ( $site_posts['posts'] as $idx => $post_data ) {
 			$post = array(
 				'post_status'  => 'publish',
-				'post_type'    => 'page',
 				'post_title'   => $post_data['title'],
 				'post_content' => $post_data['content'],
 				'post_date'    => date( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
