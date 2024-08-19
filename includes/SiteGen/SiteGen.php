@@ -305,17 +305,15 @@ class SiteGen {
 			self::cache_sitegen_response( 'site-posts', $site_posts );
 		}
 
-		$idx        = 0;
 		$post_dates = array( '3', '5', '10', '12', '17', '19' );
-		foreach ( $site_posts['posts'] as $post_title => $post_content ) {
+		foreach ( $site_posts['posts'] as $idx => $post_data ) {
 			$post = array(
-				'post_title'   => $post_title,
 				'post_status'  => 'publish',
-				'post_content' => $post_content,
 				'post_type'    => 'page',
+				'post_title'   => $post_data['title'],
+				'post_content' => $post_data['content'],
 				'post_date'    => date( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
 			);
-			$idx++;
 			\wp_insert_post( $post );
 		}
 
