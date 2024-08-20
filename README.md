@@ -21,4 +21,4 @@ A module for providing artificial intelligence capabilities.
  composer require newfold-labs/wp-module-ai
  ```
 
-[More on NewFold WordPress Modules](https://github.com/newfold-labs/wp-module-loader)
+[More on Newfold WordPress Modules](https://github.com/newfold-labs/wp-module-loader)
