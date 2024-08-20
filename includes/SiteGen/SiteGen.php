@@ -57,7 +57,9 @@ class SiteGen {
 	 * Function to check capabilities
 	 */
 	private static function check_capabilities() {
-		return true;
+		$capability      = new SiteCapabilities();
+		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
+		return $sitegen_enabled;
 	}
 
 	/**
