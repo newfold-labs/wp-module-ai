@@ -444,19 +444,48 @@ class SiteGen {
 
 		$dalle_used             = false;
 		$categories_to_separate = array( 'header', 'footer' );
+
+		// Maintain a map of hero patterns that have been chosen so as to not repeat them between homepages
+		$used_home_pattern_slugs = array();
+
 		// Choose random categories for the generated patterns and return
 		foreach ( $random_homepages as $homepage_index => $slug ) {
 			$generated_homepages[ $slug ]         = array();
 			$homepage_patterns                    = array();
 			$homepage_patterns['generatedImages'] = array();
+
+			// Maintain a map of already used pattern slugs and don't reuse them if the pattern
+			// is repeated in the content structure
+			$used_pattern_slugs = array();
+
 			foreach ( $generated_content_structures[ $slug ] as $pattern_category ) {
 				if ( empty( $generated_patterns[ $pattern_category ] ) ) {
 					continue;
 				}
+
 				// Get a random pattern for the category when regenerating otherwise pick in sequence
 				// so that the 3 previews are as different as much as possible.
-				$pattern_index  = ( $regenerate ) ? array_rand( $generated_patterns[ $pattern_category ] ) : $homepage_index;
+				$pattern_index  = array_rand( $generated_patterns[ $pattern_category ] );
 				$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
+
+				if ( 'hero' === $pattern_category ) {
+					if ( array_key_exists( $random_pattern['patternSlug'], $used_home_pattern_slugs ) ) {
+						while ( array_key_exists( $random_pattern['patternSlug'], $used_home_pattern_slugs ) ) {
+							$pattern_index  = array_rand( $generated_patterns[ $pattern_category ] );
+							$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
+						}
+					}
+					$used_home_pattern_slugs[ $random_pattern['patternSlug'] ] = 1;
+				}
+
+				if ( array_key_exists( $random_pattern['patternSlug'], $used_pattern_slugs ) ) {
+					while ( array_key_exists( $random_pattern['patternSlug'], $used_pattern_slugs ) ) {
+						$pattern_index  = array_rand( $generated_patterns[ $pattern_category ] );
+						$random_pattern = $generated_patterns[ $pattern_category ][ $pattern_index ];
+					}
+				}
+
+				$used_pattern_slugs[ $random_pattern['patternSlug'] ] = 1;
 
 				// Check if this is a hero pattern and we are at end of homepages without ever using dalle
 				if ( ! $dalle_used && count( $random_homepages ) === $homepage_index && 'hero' === $pattern_category ) {
