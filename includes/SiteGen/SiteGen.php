@@ -393,22 +393,18 @@ class SiteGen {
 
 		if ( 'siteclassification' === $identifier ) {
 			// fetch site classification mapping for generating posts
-			$site_classification_posts_mapping = self::get_sitegen_from_cache( 'siteclassificationpostsmapping' );
-			if ( ! $site_classification_posts_mapping ) {
-				$site_classification_posts_mapping = self::generate_site_meta(
+			$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
+			if ( ! $site_classification_mapping ) {
+				$site_classification_mapping = self::generate_site_meta(
 					array(
 						'site_description' => $site_info,
 					),
-					'siteclassificationpostsmapping'
+					'siteclassificationmapping'
 				);
 			}
 
-			foreach ( $site_classification_posts_mapping['types'] as $site_classification_set ) {
-				if ( $site_classification_set['primaryType'] === $parsed_response['primaryType']
-				&& $site_classification_set['secondaryType'] === $parsed_response['slug'] ) {
-					self::generate_site_posts( $site_info );
-					break;
-				}
+			if ( true === $site_classification_mapping['blog-posts-custom'][ $parsed_response['primaryType'] ][ $parsed_response['slug'] ] ) {
+				self::generate_site_posts( $site_info );
 			}
 		}
 
