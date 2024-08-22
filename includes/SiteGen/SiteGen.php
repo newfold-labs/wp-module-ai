@@ -337,12 +337,12 @@ class SiteGen {
 			);
 		}
 
-		// if ( ! $skip_cache ) {
-		// $site_gen_cached = self::get_sitegen_from_cache( $identifier );
-		// if ( $site_gen_cached ) {
-		// return $site_gen_cached;
-		// }
-		// }
+		if ( ! $skip_cache ) {
+			$site_gen_cached = self::get_sitegen_from_cache( $identifier );
+			if ( $site_gen_cached ) {
+				return $site_gen_cached;
+			}
+		}
 
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
