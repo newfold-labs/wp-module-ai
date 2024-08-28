@@ -315,6 +315,55 @@ class SiteGen {
 	/**
 	 * Function to generate the site meta according to the arguments passed
 	 *
+	 * @param array $site_info  The Site Info object, will be validated for required params.
+	 */
+	public static function generate_site_posts( $site_info ) {
+
+		// Generate AI Post Title and Content
+		$site_posts = wp_remote_post(
+			NFD_AI_BASE . 'generateSiteMeta',
+			array(
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => 60,
+				'body'    => wp_json_encode(
+					array(
+						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'prompt'     => self::get_prompt_from_info( $site_info ),
+						'identifier' => 'generatesiteposts',
+					)
+				),
+			)
+		);
+
+		$site_posts_response_code = wp_remote_retrieve_response_code( $site_posts );
+		$site_posts               = json_decode( wp_remote_retrieve_body( $site_posts ), true );
+
+		if ( 200 === $site_posts_response_code ) {
+			// If the posts were not created or enough posts were not created
+			if ( ! isset( $site_posts['posts'] ) || count( $site_posts['posts'] ) < 6 ) {
+				return false;
+			}
+			// Save Post Content in wp_options
+			self::cache_sitegen_response( 'site-posts', $site_posts );
+		}
+
+		$post_dates = array( '3', '5', '10', '12', '17', '19' );
+		foreach ( $site_posts['posts'] as $idx => $post_data ) {
+			$post = array(
+				'post_status'  => 'publish',
+				'post_title'   => $post_data['title'],
+				'post_content' => $post_data['content'],
+				'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
+			);
+			\wp_insert_post( $post );
+		}
+	}
+
+	/**
+	 * Function to generate the site meta according to the arguments passed
+	 *
 	 * @param array   $site_info  The Site Info object, will be validated for required params.
 	 * @param string  $identifier The identifier for generating the site meta
 	 * @param boolean $skip_cache To skip returning the response from cache
@@ -385,6 +434,23 @@ class SiteGen {
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
 
 		self::cache_sitegen_response( $identifier, $parsed_response );
+
+		if ( 'siteclassification' === $identifier ) {
+			// fetch site classification mapping for generating posts
+			$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
+			if ( ! $site_classification_mapping ) {
+				$site_classification_mapping = self::generate_site_meta(
+					array(
+						'site_description' => $site_info,
+					),
+					'siteclassificationmapping'
+				);
+			}
+
+			if ( true === $site_classification_mapping['blog-posts-custom'][ $parsed_response['primaryType'] ][ $parsed_response['slug'] ] ) {
+				self::generate_site_posts( $site_info );
+			}
+		}
 
 		// calling the action hook for the identifiers
 		do_action( 'newfold/ai/sitemeta-' . strtolower( $identifier ) . ':generated', $parsed_response );
