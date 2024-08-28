@@ -5,40 +5,33 @@ namespace NewfoldLabs\WP\Module\AI;
  * Class Patterns
  */
 final class Patterns {
-
 	/**
-	 * Retrieve custom content structure.
+	 * Get the custom content structure for a given site_classification_mapping_slug.
 	 *
+	 * @param string $site_classification_mapping_slug The site classification mapping site meta slug.
 	 * @return array
 	 */
-	public static function get_hero_custom_content_structure() {
-		return array( 'header', 'hero-custom', 'footer' );
+	public static function get_custom_content_structure( $site_classification_mapping_slug ) {
+		$custom_content_structures = array(
+			'hero-custom' => array( 'header', 'hero-custom', 'footer' ),
+			'blog-custom' => array( 'header', 'blog-custom', 'footer' ),
+		);
+
+		return isset( $custom_content_structures[ $site_classification_mapping_slug ] ) ? $custom_content_structures[ $site_classification_mapping_slug ] : array();
 	}
 
 	/**
-	 * Retrieve custom menu pattern slugs.
+	 * Get the custom patterns slugs for a given site_classification_mapping_slug.
 	 *
+	 * @param string $site_classification_mapping_slug The site classification mapping site meta slug.
 	 * @return array
 	 */
-	public static function get_custom_menu_slugs() {
-		return array( 'menu-8', 'menu-1', 'menu-2', 'menu-7', 'menu-3' );
-	}
-
-	/**
-	 * Check whether custom hero to be used or not.
-	 *
-	 * @param array $site_classification site classification as determined by AI
-	 * @param array $site_classification_mapping site classification mapping for which the home page pattern needs to be overridden
-	 * @return array|boolean
-	 */
-	public static function check_hero_custom_content_structure_needed( $site_classification, $site_classification_mapping ) {
-		$primary_sitetype   = $site_classification['primaryType'];
-		$secondary_sitetype = $site_classification['slug'];
-
-		if ( isset( $site_classification_mapping['hero-custom'][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
-			return $site_classification_mapping['hero-custom'][ $primary_sitetype ][ $secondary_sitetype ];
-		}
-		return false;
+	public static function get_custom_patterns_slugs( $site_classification_mapping_slug ) {
+		$custom_patterns_list = array(
+			'menu-custom' => array( 'menu-8', 'menu-1', 'menu-2', 'menu-7', 'menu-3' ),
+			'blog-custom' => array( 'blog-10', 'blog-1', 'blog-4' ),
+		);
+		return isset( $custom_patterns_list[ $site_classification_mapping_slug ] ) ? $custom_patterns_list[ $site_classification_mapping_slug ] : array();
 	}
 
 	/**
@@ -54,19 +47,19 @@ final class Patterns {
 	}
 
 	/**
-	 * Checks whether a custom menu pattern is needed for a given page and site classification.
+	 * Checks whether a given site classification site meta needs a custom content structure based on the site classification mapping site meta slug.
 	 *
-	 * @param array  $site_classification site classification as determined by AI
-	 * @param array  $site_classification_mapping site classification mapping for which the home page pattern needs to be overridden
-	 * @param string $page The slug of the page being generated.
+	 * @param string $site_classification_mapping_slug The site classification mapping site meta slug.
+	 * @param array  $site_classification_mapping The site classification mapping site meta.
+	 * @param array  $site_classification The site classification site meta.
 	 * @return boolean
 	 */
-	public static function check_custom_menu_needed( $site_classification, $site_classification_mapping, $page ) {
+	public static function needs_custom_content_structure( $site_classification_mapping_slug, $site_classification_mapping, $site_classification ) {
 		$primary_sitetype   = $site_classification['primaryType'];
 		$secondary_sitetype = $site_classification['slug'];
 
-		if ( 'menu' === $page && isset( $site_classification_mapping['menu-custom'][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
-			return $site_classification_mapping['menu-custom'][ $primary_sitetype ][ $secondary_sitetype ];
+		if ( isset( $site_classification_mapping[ $site_classification_mapping_slug ][ $primary_sitetype ][ $secondary_sitetype ] ) ) {
+			return $site_classification_mapping[ $site_classification_mapping_slug ][ $primary_sitetype ][ $secondary_sitetype ];
 		}
 
 		return false;
