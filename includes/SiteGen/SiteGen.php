@@ -6,6 +6,8 @@ use NewfoldLabs\WP\Module\AI\Utils\PatternParser;
 use NewfoldLabs\WP\Module\Data\HiiveConnection;
 use NewfoldLabs\WP\Module\Data\SiteCapabilities;
 use NewfoldLabs\WP\Module\AI\Patterns;
+use NewfoldLabs\WP\Module\Installer\Services\PluginInstaller;
+use NewfoldLabs\WP\Module\Installer\Data\Plugins;
 
 /**
  * The class to generate different parts of the site gen object.
@@ -140,7 +142,7 @@ class SiteGen {
 
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -152,6 +154,48 @@ class SiteGen {
 		}
 
 		return $processed_patterns;
+	}
+
+	/**
+	 * Get the templates for a particular category.
+	 *
+	 * @param string $category The category to get templates for.
+	 * @param array  $site_classification site classification as determined by AI.
+	 */
+	private static function get_templates_for_category( $category, $site_classification = array() ) {
+		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
+		$secondary_sitetype = isset( $site_classification['slug'] ) ? $site_classification['slug'] : null;
+		$args               = array(
+			'category'       => $category,
+			'primary_type'   => $primary_sitetype,
+			'secondary_type' => $secondary_sitetype,
+		);
+		$api_url            = NFD_PATTERNS_BASE . 'templates?' . http_build_query( $args );
+
+		$response = wp_remote_get(
+			$api_url,
+			array(
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => 60,
+			)
+		);
+
+		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return array(
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
+			);
+		}
+
+		$templates           = json_decode( wp_remote_retrieve_body( $response ), true );
+		$processed_templates = array();
+
+		foreach ( $templates['data'] as $template ) {
+			$processed_templates[ $template['slug'] ] = $template;
+		}
+
+		return $processed_templates;
 	}
 
 	/**
@@ -562,6 +606,24 @@ class SiteGen {
 				$random_menu_pattern_slug = array_rand( $menu_patterns_filtered );
 
 				return $menu_patterns_filtered[ $random_menu_pattern_slug ]['content'];
+			}
+		}
+
+		// if contact page then pick from contact page templates
+		// also make sure the jetpack plugin is installed and active
+		// then activate "contact-form" module since some templates use jetpack forms
+		if ( 'contact' === $page ) {
+			$contact_page_templates = self::get_templates_for_category( $page, $site_classification );
+			// templates fetched successfully
+			if ( ! isset( $contact_page_templates['error'] ) ) {
+				$random_contact_page_template_slug = array_rand( $contact_page_templates, 1 );
+				$contact_page_content              = $contact_page_templates[ $random_contact_page_template_slug ]['content'];
+
+				// install and activate the Jetpack plugin and enable the "contact-form" module
+				if ( PluginInstaller::install( 'jetpack', true ) && Plugins::toggle_jetpack_module( 'contact-form', true ) ) {
+					// return contact page
+					return $contact_page_content;
+				}
 			}
 		}
 
