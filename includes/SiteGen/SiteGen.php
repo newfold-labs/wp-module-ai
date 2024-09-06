@@ -316,8 +316,9 @@ class SiteGen {
 	 * Function to generate the site meta according to the arguments passed
 	 *
 	 * @param array $site_info  The Site Info object, will be validated for required params.
+	 * @param array $site_classification  The Site Classification object.
 	 */
-	public static function generate_site_posts( $site_info ) {
+	public static function generate_site_posts( $site_info, $site_classification ) {
 
 		// Generate AI Post Title and Content
 		$site_posts = wp_remote_post(
@@ -349,12 +350,24 @@ class SiteGen {
 			self::cache_sitegen_response( 'site-posts', $site_posts );
 		}
 
+		$post_patterns       = self::get_patterns_for_category( 'text', $site_classification );
+		$post_patterns_slugs = Patterns::get_custom_post_patterns();
+
 		$post_dates = array( '3', '5', '10', '12', '17', '19' );
 		foreach ( $site_posts['posts'] as $idx => $post_data ) {
+
+			$post_content = '';
+			if ( isset( $post_patterns_slugs[ $idx ] ) ) {
+				foreach ( $post_patterns_slugs[ $idx ] as $pattern_slug ) {
+					$post_content .= $post_patterns[ $pattern_slug ]['content'];
+				}
+			}
+
 			$post = array(
 				'post_status'  => 'publish',
 				'post_title'   => $post_data['title'],
-				'post_content' => $post_data['content'],
+				'post_excerpt' => $post_data['content'],
+				'post_content' => $post_content,
 				'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( 'last sunday -' . $post_dates[ $idx ] . ' days' ) ),
 			);
 			\wp_insert_post( $post );
@@ -448,7 +461,7 @@ class SiteGen {
 			}
 
 			if ( true === $site_classification_mapping['blog-posts-custom'][ $parsed_response['primaryType'] ][ $parsed_response['slug'] ] ) {
-				self::generate_site_posts( $site_info );
+				self::generate_site_posts( $site_info, $parsed_response );
 			}
 		}
 
