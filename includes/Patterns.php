@@ -46,6 +46,7 @@ final class Patterns {
 			array( 'text-1', 'text-7', 'text-16', 'text-12' ),
 			array( 'text-32' ),
 			array( 'text-28', 'text-7', 'text-5', 'text-23' ),
+			array( 'text-2', 'text-8', 'text-40' ),
 		);
 		return $custom_post_patterns;
 	}
