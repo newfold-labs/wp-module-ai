@@ -35,6 +35,23 @@ final class Patterns {
 	}
 
 	/**
+	 * Get the custom posts patterns slugs for the post content.
+	 *
+	 * @return array
+	 */
+	public static function get_custom_post_patterns() {
+		$custom_post_patterns = array(
+			array( 'text-2', 'text-8', 'text-40' ),
+			array( 'text-9' ),
+			array( 'text-1', 'text-7', 'text-16', 'text-12' ),
+			array( 'text-32' ),
+			array( 'text-28', 'text-7', 'text-5', 'text-23' ),
+			array( 'text-2', 'text-8', 'text-40' ),
+		);
+		return $custom_post_patterns;
+	}
+
+	/**
 	 * Retrieve custom pattern.
 	 *
 	 * @return array
