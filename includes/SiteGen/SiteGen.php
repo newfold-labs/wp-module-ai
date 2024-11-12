@@ -428,7 +428,7 @@ class SiteGen {
 			}
 			try {
 				$error = json_decode( wp_remote_retrieve_body( $response ), true );
-				if ( array_key_exists( 'payload', $error ) ) {
+				if ( is_array( $error ) && array_key_exists( 'payload', $error ) ) {
 					return array(
 						'error' => $error['payload'],
 					);
