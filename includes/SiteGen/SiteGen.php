@@ -85,7 +85,7 @@ class SiteGen {
 				'body'    => wp_json_encode(
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => $site_description
+						'prompt'     => $site_description,
 					)
 				),
 			)
