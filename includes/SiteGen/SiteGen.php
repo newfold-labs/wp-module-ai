@@ -166,11 +166,11 @@ class SiteGen {
 	 * @param array $site_info The JSON input for the sitegen call.
 	 */
 	private static function get_prompt_from_info( $site_info ) {
-		$details = [];
-		foreach ($site_info as $key => $value) {
-			$details[] = $key . ": " . $value;
+		$details = array();
+		foreach ( $site_info as $key => $value ) {
+			$details[] = $key . ': ' . $value;
 		}
-		return implode(", ", $details);
+		return implode( ', ', $details );
 	}
 
 	/**
