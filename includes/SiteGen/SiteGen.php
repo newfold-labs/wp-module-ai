@@ -86,7 +86,6 @@ class SiteGen {
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => $site_description,
-						'identifier' => $identifier,
 					)
 				),
 			)
@@ -94,28 +93,7 @@ class SiteGen {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
-			if ( 400 === $response_code ) {
-				$error = json_decode( wp_remote_retrieve_body( $response ), true );
-				return array(
-					'error' => $error['payload']['reason'],
-				);
-			}
-			try {
-				$error = json_decode( wp_remote_retrieve_body( $response ), true );
-				if ( array_key_exists( 'payload', $error ) ) {
-					return array(
-						'error' => $error['payload'],
-					);
-				} else {
-					return array(
-						'error' => __( 'We are unable to process the request at this moment' ),
-					);
-				}
-			} catch ( \Exception $exception ) {
-				return array(
-					'error' => __( 'We are unable to process the request at this moment' ),
-				);
-			}
+			return $site_description;
 		}
 
 		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
