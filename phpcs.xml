@@ -24,4 +24,10 @@
         <!-- Comment punctuation doesn't matter -->
         <exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop" />
     </rule>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array" value="wp-module-ai" />
+        </properties>
+    </rule>
 </ruleset>

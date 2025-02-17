@@ -421,13 +421,13 @@ class SiteGen {
 	public static function generate_site_meta( $site_info, $identifier, $skip_cache = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
-				'error' => __( 'You do not have the permissions to perform this action' ),
+				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
 			);
 		}
 
 		if ( ! self::validate_site_info( $site_info, $identifier ) ) {
 			return array(
-				'error' => __( 'Required values not provided' ),
+				'error' => __( 'Required values not provided', 'wp-module-ai' ),
 			);
 		}
 
@@ -473,12 +473,12 @@ class SiteGen {
 					);
 				} else {
 					return array(
-						'error' => __( 'We are unable to process the request at this moment' ),
+						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 					);
 				}
 			} catch ( \Exception $exception ) {
 				return array(
-					'error' => __( 'We are unable to process the request at this moment' ),
+					'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 				);
 			}
 		}
@@ -511,7 +511,7 @@ class SiteGen {
 			return $parsed_response;
 		} catch ( \Exception $exception ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 	}
@@ -528,7 +528,7 @@ class SiteGen {
 	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
-				'error' => __( 'You do not have the permissions to perform this action' ),
+				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
 			);
 		}
 
@@ -590,12 +590,12 @@ class SiteGen {
 						);
 					} else {
 						return array(
-							'error' => __( 'We are unable to process the request at this moment' ),
+							'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 						);
 					}
 				} catch ( \Exception $exception ) {
 					return array(
-						'error' => __( 'We are unable to process the request at this moment' ),
+						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 					);
 				}
 			}
@@ -848,12 +848,12 @@ class SiteGen {
 					);
 				} else {
 					return array(
-						'error' => __( 'We are unable to process the request at this moment' ),
+						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 					);
 				}
 			} catch ( \Exception $exception ) {
 				return array(
-					'error' => __( 'We are unable to process the request at this moment' ),
+					'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 				);
 			}
 		}
@@ -885,7 +885,7 @@ class SiteGen {
 	) {
 		if ( ! self::check_capabilities() ) {
 			return array(
-				'error' => __( 'You do not have the permissions to perform this action' ),
+				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
 			);
 		}
 
