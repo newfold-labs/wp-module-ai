@@ -80,7 +80,10 @@ class SiteGen {
 
 		// Check cache first
 		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
-		if ( $refined_description ) {
+		if ( null !== $refined_description ) {
+			if( is_array( $refined_description ) ) {
+				$refined_description = $refined_description['site_description'];
+			}
 			return $is_array ? array_merge( $original_data, array( 'site_description' => $refined_description ) ) : $refined_description;
 		}
 
