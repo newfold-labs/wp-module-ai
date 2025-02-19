@@ -70,11 +70,21 @@ class SiteGen {
 	 * @param string $site_description The site description
 	 */
 	private static function get_refined_site_description( $site_description ) {
-		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
-		if ( $refined_description ) {
-			return $refined_description;
+		$is_array      = is_array( $site_description );
+		$original_data = $site_description;
+
+		// Extract site_description if input is an array
+		if ( $is_array && isset( $site_description['site_description'] ) ) {
+			$site_description = $site_description['site_description'];
 		}
 
+		// Check cache first
+		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
+		if ( $refined_description ) {
+			return $is_array ? array_merge( $original_data, array( 'site_description' => $refined_description ) ) : $refined_description;
+		}
+
+		// Send request to refine site description
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'refineSiteDescription',
 			array(
@@ -84,7 +94,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'hiivetoken' => 'test-ai-sitegen',
 						'prompt'     => $site_description,
 					)
 				),
@@ -93,12 +103,14 @@ class SiteGen {
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
-			return $site_description;
+			return $is_array ? $original_data : $site_description;
 		}
 
 		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
+
 		self::cache_sitegen_response( 'refinedSiteDescription', $refined_description );
-		return $refined_description;
+
+		return $is_array ? array_merge( $original_data, array( 'site_description' => $refined_description ) ) : $refined_description;
 	}
 
 	/**
@@ -438,7 +450,7 @@ class SiteGen {
 			}
 		}
 
-		$refined_description = self::get_refined_site_description( self::get_prompt_from_info( $site_info ) );
+		$site_info = self::get_refined_site_description( $site_info );
 
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
@@ -450,7 +462,7 @@ class SiteGen {
 				'body'    => wp_json_encode(
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => $refined_description,
+						'prompt'     => self::get_prompt_from_info( $site_info ),
 						'identifier' => $identifier,
 					)
 				),
