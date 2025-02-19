@@ -493,7 +493,7 @@ class SiteGen {
 			if ( ! $site_classification_mapping ) {
 				$site_classification_mapping = self::generate_site_meta(
 					array(
-						'site_description' => $site_info,
+						'site_description' => $site_info['site_description'],
 					),
 					'siteclassificationmapping'
 				);
