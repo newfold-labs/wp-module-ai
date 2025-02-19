@@ -165,7 +165,7 @@ class SiteGen {
 	 *
 	 * @param array $site_info The JSON input for the sitegen call.
 	 */
-	private static function get_prompt_from_info( $site_info ) {
+	private static function get_prompt_from_info( array $site_info ) {
 		$details = array();
 		foreach ( $site_info as $key => $value ) {
 			$details[] = $key . ': ' . $value;
