@@ -146,8 +146,8 @@ class SiteGen {
 	private static function get_prompt_from_info( array $site_info ) {
 		$details = array();
 		foreach ( $site_info as $key => $value ) {
-			if (is_array($value)) {
-				$value = "\r\n" . self::get_prompt_from_info($value);
+			if ( is_array( $value ) ) {
+				$value = "\r\n" . self::get_prompt_from_info( $value );
 			}
 			$details[] = $key . ': ' . $value;
 		}
