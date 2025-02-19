@@ -94,7 +94,7 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => 'test-ai-sitegen',
+						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => $site_description,
 					)
 				),
