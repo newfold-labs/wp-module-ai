@@ -438,7 +438,7 @@ class SiteGen {
 			}
 		}
 
-		$refined_description = self::get_refined_site_description( self::get_prompt_from_info( $site_info ) );
+		$refined_description = self::get_refined_site_description( $site_info['site_description'] );
 
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
