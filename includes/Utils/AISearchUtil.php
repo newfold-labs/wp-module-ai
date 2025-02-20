@@ -50,7 +50,7 @@ class AISearchUtil {
 
 		if ( ! self::check_capabilities() ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -74,7 +74,7 @@ class AISearchUtil {
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -82,7 +82,7 @@ class AISearchUtil {
 
 		if ( isset( $parsed_response['status'] ) && 'Failure' === $parsed_response['status'] ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -93,7 +93,7 @@ class AISearchUtil {
 			);
 		} catch ( \Exception $exception ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 	}
@@ -107,7 +107,7 @@ class AISearchUtil {
 	public static function get_default_search_results( $hiive_token ) {
 		if ( ! self::check_help_capability() ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -128,7 +128,7 @@ class AISearchUtil {
 		);
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 
@@ -140,7 +140,7 @@ class AISearchUtil {
 			);
 		} catch ( \Exception $exception ) {
 			return array(
-				'error' => __( 'We are unable to process the request at this moment' ),
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
 		}
 	}

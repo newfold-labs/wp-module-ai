@@ -226,7 +226,7 @@ class AISearchController extends \WP_REST_Controller {
 		if ( ! $hiive_token ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You are not authorized to make this call' ),
+				__( 'You are not authorized to make this call', 'wp-module-ai' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -253,7 +253,7 @@ class AISearchController extends \WP_REST_Controller {
 		if ( ! $hiive_token ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You are not authorized to make this call' ),
+				__( 'You are not authorized to make this call', 'wp-module-ai' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -276,7 +276,7 @@ class AISearchController extends \WP_REST_Controller {
 		if ( ! current_user_can( 'read' ) ) {
 			return new \WP_Error(
 				'rest_forbidden',
-				__( 'You must be authenticated to make this call' ),
+				__( 'You must be authenticated to make this call', 'wp-module-ai' ),
 				array( 'status' => 401 )
 			);
 		}

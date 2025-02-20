@@ -25,7 +25,7 @@ if ( function_exists( 'add_action' ) ) {
 			register(
 				array(
 					'name'     => 'ai',
-					'label'    => __( 'ai', 'newfold-ai-module' ),
+					'label'    => __( 'ai', 'wp-module-ai' ),
 					'callback' => function ( Container $container ) {
 						return new AI( $container );
 					},

@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-02-17T17:21:08+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: wp-module-ai\n"
+
+#: bootstrap.php:28
+msgid "ai"
+msgstr ""
+
+#: includes/RestApi/AISearchController.php:229
+#: includes/RestApi/AISearchController.php:256
+msgid "You are not authorized to make this call"
+msgstr ""
+
+#: includes/RestApi/AISearchController.php:279
+msgid "You must be authenticated to make this call"
+msgstr ""
+
+#: includes/SiteGen/SiteGen.php:182
+#: includes/SiteGen/SiteGen.php:224
+#: includes/SiteGen/SiteGen.php:476
+#: includes/SiteGen/SiteGen.php:481
+#: includes/SiteGen/SiteGen.php:514
+#: includes/SiteGen/SiteGen.php:593
+#: includes/SiteGen/SiteGen.php:598
+#: includes/SiteGen/SiteGen.php:851
+#: includes/SiteGen/SiteGen.php:856
+#: includes/Utils/AISearchUtil.php:53
+#: includes/Utils/AISearchUtil.php:77
+#: includes/Utils/AISearchUtil.php:85
+#: includes/Utils/AISearchUtil.php:96
+#: includes/Utils/AISearchUtil.php:110
+#: includes/Utils/AISearchUtil.php:131
+#: includes/Utils/AISearchUtil.php:143
+msgid "We are unable to process the request at this moment"
+msgstr ""
+
+#: includes/SiteGen/SiteGen.php:424
+#: includes/SiteGen/SiteGen.php:531
+#: includes/SiteGen/SiteGen.php:888
+msgid "You do not have the permissions to perform this action"
+msgstr ""
+
+#: includes/SiteGen/SiteGen.php:430
+msgid "Required values not provided"
+msgstr ""
