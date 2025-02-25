@@ -52,7 +52,7 @@ class AI {
 		\load_plugin_textdomain(
 			'wp-module-ai',
 			false,
-			NFD_COMING_SOON_DIR . '/languages'
+			NFD_MODULE_AI_DIR . '/languages'
 		);
 	}
 }
