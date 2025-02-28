@@ -25,6 +25,7 @@ class AI {
 	public function __construct( Container $container ) {
 		$this->container = $container;
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+		\add_action( 'init', array( __CLASS__, 'load_text_domain' ), 100 );
 	}
 
 	/**
@@ -39,5 +40,19 @@ class AI {
 			$instance = new $controller();
 			$instance->register_routes();
 		}
+	}
+
+	/**
+	 * Load text domain for Module
+	 *
+	 * @return void
+	 */
+	public static function load_text_domain() {
+
+		\load_plugin_textdomain(
+			'wp-module-ai',
+			false,
+			NFD_MODULE_AI_DIR . '/languages'
+		);
 	}
 }
