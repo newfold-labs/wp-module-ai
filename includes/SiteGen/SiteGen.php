@@ -21,37 +21,48 @@ class SiteGen {
 	private static $required_validations = array(
 		'siteclassification'        => array(
 			'site_description',
+			'site_id',
 		),
 		'targetaudience'            => array(
 			'site_description',
+			'site_id',
 		),
 		'contenttones'              => array(
 			'site_description',
+			'site_id',
 		),
 		'contentstructure'          => array(
 			'site_description',
+			'site_id',
 		),
 		'colorpalette'              => array(
 			'site_description',
+			'site_id',
 		),
 		'sitemap'                   => array(
 			'site_description',
+			'site_id',
 		),
 		'pluginrecommendation'      => array(
 			'site_description',
+			'site_id',
 		),
 		'fontpair'                  => array(
 			'site_description',
+			'site_id',
 		),
 		'keywords'                  => array(
 			'site_description',
 			'content_style',
+			'site_id',
 		),
 		'siteconfig'                => array(
 			'site_description',
+			'site_id',
 		),
 		'siteclassificationmapping' => array(
 			'site_description',
+			'site_id',
 		),
 	);
 
@@ -62,43 +73,6 @@ class SiteGen {
 		$capability      = new SiteCapabilities();
 		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
 		return $sitegen_enabled;
-	}
-
-	/**
-	 * Function to refine the site description, i.e. translate and summarize when required
-	 *
-	 * @param string $site_description The site description
-	 */
-	private static function get_refined_site_description( $site_description ) {
-		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
-		if ( $refined_description ) {
-			return $refined_description;
-		}
-
-		$response = wp_remote_post(
-			NFD_AI_BASE . 'refineSiteDescription',
-			array(
-				'headers' => array(
-					'Content-Type' => 'application/json',
-				),
-				'timeout' => 60,
-				'body'    => wp_json_encode(
-					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => $site_description,
-					)
-				),
-			)
-		);
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( 200 !== $response_code ) {
-			return $site_description;
-		}
-
-		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
-		self::cache_sitegen_response( 'refinedSiteDescription', $refined_description );
-		return $refined_description;
 	}
 
 	/**
@@ -236,120 +210,6 @@ class SiteGen {
 	}
 
 	/**
-	 * Function to generate all possible patterns for the current generation.
-	 *
-	 * @param string  $site_description  The site description (the user prompt)
-	 * @param array   $content_style     The generated content style.
-	 * @param array   $target_audience   The generated target audience.
-	 * @param array   $content_structures The content structures generated / cached
-	 * @param boolean $skip_cache        If we need to skip cache.
-	 */
-	private static function generate_pattern_content(
-		$site_description,
-		$content_style,
-		$target_audience,
-		$content_structures,
-		$skip_cache = false
-	) {
-		if ( ! $skip_cache ) {
-			$generated_patterns = self::get_sitegen_from_cache( 'contentRegenerate' );
-			if ( $generated_patterns ) {
-				return $generated_patterns;
-			}
-		}
-
-		$keywords = self::generate_site_meta(
-			array(
-				'site_description' => $site_description,
-				'content_style'    => $content_style,
-			),
-			'keywords'
-		);
-
-		$unique_categories = array();
-		foreach ( $content_structures as $homepage => $structure ) {
-			foreach ( $structure as $category ) {
-				if ( ! in_array( $category, $unique_categories, true ) ) {
-					array_push( $unique_categories, $category );
-				}
-			}
-		}
-
-		$category_pattern_map = array();
-
-		// Generate patterns randomly for the unique categories
-		foreach ( $unique_categories as $category ) {
-			$patterns_for_category = self::get_patterns_for_category( $category );
-			if ( count( $patterns_for_category ) <= 5 ) {
-				$random_selected_patterns = array_rand( $patterns_for_category, count( $patterns_for_category ) );
-			} else {
-				$random_selected_patterns = array_rand( $patterns_for_category, 5 );
-			}
-
-			$category_pattern_map[ $category ] = array();
-			$category_content                  = array();
-			$category_patterns                 = array();
-			$category_base_patterns            = array();
-			foreach ( $random_selected_patterns as $pattern_slug ) {
-				$pattern                = $patterns_for_category[ $pattern_slug ];
-				$pattern_parser         = new PatternParser( $pattern['content'] );
-				$pattern_representation = $pattern_parser->get_pattern_representation();
-				array_push( $category_content, $pattern_representation );
-				array_push( $category_patterns, $pattern_parser );
-				array_push( $category_base_patterns, $pattern['content'] );
-			}
-			$generated_content = wp_remote_post(
-				NFD_AI_BASE . 'generateSiteMeta',
-				array(
-					'headers' => array(
-						'Content-Type' => 'application/json',
-					),
-					'timeout' => 60,
-					'body'    => wp_json_encode(
-						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
-							'prompt'     => array(
-								'site_description' => $site_description,
-								'keywords'         => wp_json_encode( $keywords ),
-								'content_style'    => wp_json_encode( $content_style ),
-								'target_audience'  => wp_json_encode( $target_audience ),
-								'content'          => $category_content,
-							),
-							'identifier' => 'generateContent',
-						)
-					),
-				)
-			);
-
-			$generated_content = json_decode( wp_remote_retrieve_body( $generated_content ), true );
-
-			if ( array_key_exists( 'content', $generated_content ) ) {
-				$generated_content = $generated_content['content'];
-			} else {
-				$generated_content = array();
-			}
-
-			$category_content_length = count( $category_content );
-			for ( $i = 0; $i < $category_content_length; $i++ ) {
-				if ( empty( $generated_content ) ) {
-					array_push( $category_pattern_map[ $category ], $category_base_patterns[ $i ] );
-				}
-				if ( array_key_exists( $i, $generated_content ) ) {
-					$generated_pattern = $category_patterns[ $i ]->get_replaced_pattern( $generated_content[ $i ] );
-					array_push( $category_pattern_map[ $category ], $generated_pattern );
-				} else {
-					array_push( $category_pattern_map[ $category ], $category_base_patterns[ $i ] );
-				}
-			}
-		}
-
-		// Store the categories
-		self::cache_sitegen_response( 'contentRegenerate', $category_pattern_map );
-
-		return $category_pattern_map;
-	}
-
-	/**
 	 * Function to generate the site meta according to the arguments passed
 	 *
 	 * @param array $site_info  The Site Info object, will be validated for required params.
@@ -438,8 +298,6 @@ class SiteGen {
 			}
 		}
 
-		$refined_description = self::get_refined_site_description( $site_info['site_description'] );
-
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
 			array(
@@ -450,7 +308,8 @@ class SiteGen {
 				'body'    => wp_json_encode(
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => $refined_description,
+						'prompt'     => $site_info['site_description'],
+						'site_id'    => $site_indo['site_id'],
 						'identifier' => $identifier,
 					)
 				),
@@ -520,12 +379,13 @@ class SiteGen {
 	 * Function to get the home page patterns. Randomly generates the patterns and substitutes with existing content.
 	 * Set regenerate to get new combinations
 	 *
+	 * @param string  $site_id          The unique UUID generated for site.
 	 * @param string  $site_description The site description (user prompt).
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
+	public static function get_home_pages( $site_id, $site_description, $content_style, $target_audience, $regenerate = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -539,8 +399,6 @@ class SiteGen {
 				return $generated_homepages;
 			}
 		}
-
-		$site_description = self::get_refined_site_description( $site_description );
 
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
@@ -563,6 +421,7 @@ class SiteGen {
 					'body'    => wp_json_encode(
 						array(
 							'hiivetoken' => HiiveConnection::get_auth_token(),
+							'site_id'    => $site_id,
 							'prompt'     => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -623,6 +482,7 @@ class SiteGen {
 			$site_classification_mapping = self::generate_site_meta(
 				array(
 					'site_description' => $site_description,
+					'site_id'          => $site_id,
 				),
 				'siteclassificationmapping'
 			);
@@ -752,6 +612,7 @@ class SiteGen {
 	/**
 	 * Function to get the content for a page
 	 *
+	 * @param string $site_id          The uuid generated for the site.
 	 * @param string $site_description The site description (user prompt).
 	 * @param array  $content_style    Generated from sitegen.
 	 * @param array  $target_audience  Generated target audience.
@@ -759,6 +620,7 @@ class SiteGen {
 	 * @param string $page             The page
 	 */
 	public static function get_content_for_page(
+		$site_id,
 		$site_description,
 		$content_style,
 		$target_audience,
@@ -821,6 +683,7 @@ class SiteGen {
 				'body'    => wp_json_encode(
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'site_id'    => $site_id,
 						'prompt'     => array(
 							'site_description' => $site_description,
 							'content_style'    => wp_json_encode( $content_style ),
@@ -870,6 +733,7 @@ class SiteGen {
 	/**
 	 * Function to get the page patterns
 	 *
+	 * @param string  $site_id          The generated UUID for the site.
 	 * @param string  $site_description The site description (user prompt).
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
@@ -877,6 +741,7 @@ class SiteGen {
 	 * @param boolean $skip_cache       To skip or not to skip
 	 */
 	public static function get_pages(
+		$site_id,
 		$site_description,
 		$content_style,
 		$target_audience,
@@ -888,8 +753,6 @@ class SiteGen {
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
 			);
 		}
-
-		$site_description = self::get_refined_site_description( $site_description );
 
 		$identifier = 'generatePages';
 
@@ -911,6 +774,7 @@ class SiteGen {
 			}
 
 			$response = self::get_content_for_page(
+				$site_id,
 				$site_description,
 				$content_style,
 				$target_audience,
