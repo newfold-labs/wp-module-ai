@@ -76,6 +76,39 @@ class SiteGen {
 	}
 
 	/**
+	 * Function to refine the site description, i.e. translate and summarize when required
+	 *
+	 * @param string $site_id          The site UUID for persistance.
+	 * @param string $site_description The site description
+	 */
+	public static function get_refined_site_description( $site_id, $site_description ) {
+		$response = wp_remote_post(
+			NFD_AI_BASE . 'refineSiteDescription',
+			array(
+				'headers' => array(
+					'Content-Type' => 'application/json',
+				),
+				'timeout' => 60,
+				'body'    => wp_json_encode(
+					array(
+						'site_id'    => $site_id,
+						'hiivetoken' => HiiveConnection::get_auth_token(),
+						'prompt'     => $site_description,
+					)
+				),
+			)
+		);
+
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			return $site_description;
+		}
+
+		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
+		return $refined_description;
+	}
+
+	/**
 	 * Function to validate site info
 	 *
 	 * @param array  $site_info  The main input for forming the prompt
@@ -309,7 +342,7 @@ class SiteGen {
 					array(
 						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => $site_info['site_description'],
-						'site_id'    => $site_indo['site_id'],
+						'site_id'    => $site_info['site_id'],
 						'identifier' => $identifier,
 					)
 				),
