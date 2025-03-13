@@ -552,6 +552,16 @@ class SiteGen {
 			),
 			'keywords'
 		);
+
+		// Site classification: primary and secondary types
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		$primaryType = 'other';
+		$secondaryType = 'other';
+		if ( is_array( $site_classification ) ) {
+			$primaryType = $site_classification['primaryType'] ?? 'other';
+			$secondaryType = $site_classification['slug'] ?? 'other';
+		}
+		
 		if ( ! $generated_content_structures ) {
 			$response      = wp_remote_post(
 				NFD_AI_BASE . 'generatePageContent',
@@ -570,6 +580,8 @@ class SiteGen {
 								'target_audience'  => wp_json_encode( $target_audience ),
 							),
 							'page'       => 'home',
+							'primaryType' => $primaryType,
+							'secondaryType' => $secondaryType,
 						)
 					),
 				)
@@ -811,6 +823,15 @@ class SiteGen {
 			}
 		}
 
+		// Site classification: primary and secondary types
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		$primaryType = 'other';
+		$secondaryType = 'other';
+		if ( is_array( $site_classification ) ) {
+			$primaryType = $site_classification['primaryType'] ?? 'other';
+			$secondaryType = $site_classification['slug'] ?? 'other';
+		}
+
 		$response      = wp_remote_post(
 			NFD_AI_BASE . 'generatePageContent',
 			array(
@@ -823,11 +844,13 @@ class SiteGen {
 						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => array(
 							'site_description' => $site_description,
+							'keywords'   => wp_json_encode( $keywords ),
 							'content_style'    => wp_json_encode( $content_style ),
 							'target_audience'  => wp_json_encode( $target_audience ),
 						),
 						'page'       => $page,
-						'keywords'   => wp_json_encode( $keywords ),
+						'primaryType' => $primaryType,
+						'secondaryType' => $secondaryType,
 					)
 				),
 			)
