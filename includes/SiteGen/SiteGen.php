@@ -555,11 +555,11 @@ class SiteGen {
 
 		// Site classification: primary and secondary types
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
-		$primaryType = 'other';
-		$secondaryType = 'other';
+		$primary_type        = 'other';
+		$secondary_type      = 'other';
 		if ( is_array( $site_classification ) ) {
-			$primaryType = $site_classification['primaryType'] ?? 'other';
-			$secondaryType = $site_classification['slug'] ?? 'other';
+			$primary_type   = $site_classification['primaryType'] ?? 'other';
+			$secondary_type = $site_classification['slug'] ?? 'other';
 		}
 		
 		if ( ! $generated_content_structures ) {
@@ -572,16 +572,16 @@ class SiteGen {
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
-							'prompt'     => array(
+							'hiivetoken'    => HiiveConnection::get_auth_token(),
+							'prompt'        => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
 								'content_style'    => wp_json_encode( $content_style ),
 								'target_audience'  => wp_json_encode( $target_audience ),
 							),
-							'page'       => 'home',
-							'primaryType' => $primaryType,
-							'secondaryType' => $secondaryType,
+							'page'          => 'home',
+							'primaryType'   => $primary_type,
+							'secondaryType' => $secondary_type,
 						)
 					),
 				)
@@ -825,11 +825,11 @@ class SiteGen {
 
 		// Site classification: primary and secondary types
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
-		$primaryType = 'other';
-		$secondaryType = 'other';
+		$primary_type        = 'other';
+		$secondary_type      = 'other';
 		if ( is_array( $site_classification ) ) {
-			$primaryType = $site_classification['primaryType'] ?? 'other';
-			$secondaryType = $site_classification['slug'] ?? 'other';
+			$primary_type   = $site_classification['primaryType'] ?? 'other';
+			$secondary_type = $site_classification['slug'] ?? 'other';
 		}
 
 		$response      = wp_remote_post(
@@ -841,16 +841,16 @@ class SiteGen {
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => array(
+						'hiivetoken'    => HiiveConnection::get_auth_token(),
+						'prompt'        => array(
 							'site_description' => $site_description,
-							'keywords'   => wp_json_encode( $keywords ),
+							'keywords'         => wp_json_encode( $keywords ),
 							'content_style'    => wp_json_encode( $content_style ),
 							'target_audience'  => wp_json_encode( $target_audience ),
 						),
-						'page'       => $page,
-						'primaryType' => $primaryType,
-						'secondaryType' => $secondaryType,
+						'page'          => $page,
+						'primaryType'   => $primary_type,
+						'secondaryType' => $secondary_type,
 					)
 				),
 			)
