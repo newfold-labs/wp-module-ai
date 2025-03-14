@@ -561,7 +561,7 @@ class SiteGen {
 			$primary_type   = $site_classification['primaryType'] ?? 'other';
 			$secondary_type = $site_classification['slug'] ?? 'other';
 		}
-		
+
 		if ( ! $generated_content_structures ) {
 			$response      = wp_remote_post(
 				NFD_AI_BASE . 'generatePageContent',
