@@ -567,12 +567,12 @@ class SiteGen {
 				NFD_AI_BASE . 'generatePageContent',
 				array(
 					'headers' => array(
-						'Content-Type' => 'application/json',
+						'Content-Type'  => 'application/json',
+						'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 					),
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken'    => HiiveConnection::get_auth_token(),
 							'prompt'        => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -836,12 +836,12 @@ class SiteGen {
 			NFD_AI_BASE . 'generatePageContent',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken'    => HiiveConnection::get_auth_token(),
 						'prompt'        => array(
 							'site_description' => $site_description,
 							'keywords'         => wp_json_encode( $keywords ),
