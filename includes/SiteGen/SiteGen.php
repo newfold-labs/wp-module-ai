@@ -552,24 +552,36 @@ class SiteGen {
 			),
 			'keywords'
 		);
+
+		// Site classification: primary and secondary types
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		$primary_type        = 'other';
+		$secondary_type      = 'other';
+		if ( is_array( $site_classification ) ) {
+			$primary_type   = $site_classification['primaryType'] ?? 'other';
+			$secondary_type = $site_classification['slug'] ?? 'other';
+		}
+
 		if ( ! $generated_content_structures ) {
 			$response      = wp_remote_post(
-				NFD_AI_BASE . 'generatePageContent',
+				NFD_CONTENT_GENERATION_BASE . 'page',
 				array(
 					'headers' => array(
-						'Content-Type' => 'application/json',
+						'Content-Type'  => 'application/json',
+						'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 					),
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken' => HiiveConnection::get_auth_token(),
-							'prompt'     => array(
+							'prompt'        => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
 								'content_style'    => wp_json_encode( $content_style ),
 								'target_audience'  => wp_json_encode( $target_audience ),
 							),
-							'page'       => 'home',
+							'page'          => 'home',
+							'primaryType'   => $primary_type,
+							'secondaryType' => $secondary_type,
 						)
 					),
 				)
@@ -811,23 +823,34 @@ class SiteGen {
 			}
 		}
 
+		// Site classification: primary and secondary types
+		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
+		$primary_type        = 'other';
+		$secondary_type      = 'other';
+		if ( is_array( $site_classification ) ) {
+			$primary_type   = $site_classification['primaryType'] ?? 'other';
+			$secondary_type = $site_classification['slug'] ?? 'other';
+		}
+
 		$response      = wp_remote_post(
-			NFD_AI_BASE . 'generatePageContent',
+			NFD_CONTENT_GENERATION_BASE . 'page',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => array(
+						'prompt'        => array(
 							'site_description' => $site_description,
+							'keywords'         => wp_json_encode( $keywords ),
 							'content_style'    => wp_json_encode( $content_style ),
 							'target_audience'  => wp_json_encode( $target_audience ),
 						),
-						'page'       => $page,
-						'keywords'   => wp_json_encode( $keywords ),
+						'page'          => $page,
+						'primaryType'   => $primary_type,
+						'secondaryType' => $secondary_type,
 					)
 				),
 			)
