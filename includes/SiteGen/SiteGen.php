@@ -564,7 +564,7 @@ class SiteGen {
 
 		if ( ! $generated_content_structures ) {
 			$response      = wp_remote_post(
-				NFD_AI_BASE . 'generatePageContent',
+				NFD_CONTENT_GENERATION_BASE . 'page',
 				array(
 					'headers' => array(
 						'Content-Type'  => 'application/json',
@@ -833,7 +833,7 @@ class SiteGen {
 		}
 
 		$response      = wp_remote_post(
-			NFD_AI_BASE . 'generatePageContent',
+			NFD_CONTENT_GENERATION_BASE . 'page',
 			array(
 				'headers' => array(
 					'Content-Type'  => 'application/json',
