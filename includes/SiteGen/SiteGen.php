@@ -564,15 +564,15 @@ class SiteGen {
 
 		if ( ! $generated_content_structures ) {
 			$response      = wp_remote_post(
-				NFD_AI_BASE . 'generatePageContent',
+				NFD_CONTENT_GENERATION_BASE . 'page',
 				array(
 					'headers' => array(
-						'Content-Type' => 'application/json',
+						'Content-Type'  => 'application/json',
+						'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 					),
 					'timeout' => 60,
 					'body'    => wp_json_encode(
 						array(
-							'hiivetoken'    => HiiveConnection::get_auth_token(),
 							'prompt'        => array(
 								'site_description' => $site_description,
 								'keywords'         => wp_json_encode( $keywords ),
@@ -833,15 +833,15 @@ class SiteGen {
 		}
 
 		$response      = wp_remote_post(
-			NFD_AI_BASE . 'generatePageContent',
+			NFD_CONTENT_GENERATION_BASE . 'page',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'  => 'application/json',
+					'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
 					array(
-						'hiivetoken'    => HiiveConnection::get_auth_token(),
 						'prompt'        => array(
 							'site_description' => $site_description,
 							'keywords'         => wp_json_encode( $keywords ),
