@@ -629,62 +629,6 @@ class SiteGen {
 
 		$generated_patterns = self::get_sitegen_from_cache( 'generatedPatterns' );
 
-		// fetch site classification mapping
-		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
-		if ( ! $site_classification_mapping ) {
-			$site_classification_mapping = self::generate_site_meta(
-				array(
-					'site_description' => $site_description,
-				),
-				'siteclassificationmapping'
-			);
-		}
-		// check if custom hero patterns needs to be added
-		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
-		if ( Patterns::needs_custom_content_structure( 'hero-custom', $site_classification_mapping, $site_classification ) ) {
-			// update content structures and generated patterns
-			$custom_structure = Patterns::get_custom_content_structure( 'hero-custom' );
-			foreach ( $generated_content_structures as $home_slug => $structure ) {
-				$generated_content_structures[ $home_slug ] = $custom_structure;
-			}
-			$generated_patterns['hero-custom'] = array_pad( array(), 3, Patterns::get_custom_hero_pattern() );
-		}
-
-		// Check if a custom blog homepage structure is needed.
-		if ( Patterns::needs_custom_content_structure( 'blog-custom', $site_classification_mapping, $site_classification ) ) {
-			// Fetch the blog patterns.
-			$blog_patterns = self::get_patterns_for_category( 'blog', $site_classification );
-			if ( ! $blog_patterns['error'] ) {
-				// Filter out unnecessary blog patterns.
-				$blog_patterns_slugs    = Patterns::get_custom_patterns_slugs( 'blog-custom' );
-				$blog_patterns_filtered = array_filter(
-					$blog_patterns,
-					function ( $key ) use ( $blog_patterns_slugs ) {
-						return in_array( $key, $blog_patterns_slugs, true );
-					},
-					ARRAY_FILTER_USE_KEY
-				);
-
-				// Set the content structure of the generated homepages to match the custom blog content structure.
-				$custom_structure = Patterns::get_custom_content_structure( 'blog-custom' );
-				foreach ( $generated_content_structures as $home_slug => $structure ) {
-					$generated_content_structures[ $home_slug ] = $custom_structure;
-				}
-
-				// Populate the blog-custom content structure patterns in the generated patterns list.
-				$generated_patterns['blog-custom'] = array();
-
-				foreach ( $blog_patterns_filtered as $slug => $pattern ) {
-					array_push(
-						$generated_patterns['blog-custom'],
-						array(
-							'replacedPattern' => $pattern['content'],
-						)
-					);
-				}
-			}
-		}
-
 		$random_homepages    = array_rand( $generated_content_structures, 3 );
 		$generated_homepages = array();
 
