@@ -19,7 +19,7 @@ if ( function_exists( 'add_action' ) ) {
 				define( 'NFD_AI_SERVICE_BASE', 'https://hiive.cloud/workers/ai-proxy/v1/' );
 				define( 'NFD_AI_BASE', 'https://hiive.cloud/workers/ai-sitegen-proxy/' );
 				define( 'NFD_PATTERNS_BASE', 'https://patterns.hiive.cloud/' );
-				define( 'NFD_CONTENT_GENERATION_BASE', 'https://patterns.hiive.cloud/api/v1/content-generation/' );
+				define( 'NFD_CONTENT_GENERATION_BASE', 'https://bdfa-2406-7400-9a-89cc-781f-2d15-ff82-b6bf.ngrok-free.app/api/v1/content-generation/' );
 				define( 'NFD_SITEGEN_OPTION', 'nfd-ai-site-gen' );
 			}
 

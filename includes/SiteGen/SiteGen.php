@@ -416,9 +416,10 @@ class SiteGen {
 	 *
 	 * @param array   $site_info  The Site Info object, will be validated for required params.
 	 * @param string  $identifier The identifier for generating the site meta
+	 * @param string  $locale     The locale for site's content.
 	 * @param boolean $skip_cache To skip returning the response from cache
 	 */
-	public static function generate_site_meta( $site_info, $identifier, $skip_cache = false ) {
+	public static function generate_site_meta( $site_info, $identifier, $locale, $skip_cache = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -452,6 +453,7 @@ class SiteGen {
 						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => $refined_description,
 						'identifier' => $identifier,
+						'locale'     => $locale,
 					)
 				),
 			)
@@ -495,7 +497,8 @@ class SiteGen {
 					array(
 						'site_description' => $site_info['site_description'],
 					),
-					'siteclassificationmapping'
+					'siteclassificationmapping',
+					$locale,
 				);
 			}
 
@@ -523,9 +526,10 @@ class SiteGen {
 	 * @param string  $site_description The site description (user prompt).
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
+	 * @param string  $locale           The locale for site's content.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $regenerate = false ) {
+	public static function get_home_pages( $site_description, $content_style, $target_audience, $locale, $regenerate = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -550,7 +554,8 @@ class SiteGen {
 				'site_description' => $site_description,
 				'content_style'    => $content_style,
 			),
-			'keywords'
+			'keywords',
+			$locale,
 		);
 
 		// Site classification: primary and secondary types
@@ -582,6 +587,7 @@ class SiteGen {
 							'page'          => 'home',
 							'primaryType'   => $primary_type,
 							'secondaryType' => $secondary_type,
+							'locale'        => $locale,
 						)
 					),
 				)
@@ -769,13 +775,15 @@ class SiteGen {
 	 * @param array  $target_audience  Generated target audience.
 	 * @param array  $keywords         Generated keywords for page.
 	 * @param string $page             The page
+	 * @param string $locale           The site content's locale.
 	 */
 	public static function get_content_for_page(
 		$site_description,
 		$content_style,
 		$target_audience,
 		$keywords,
-		$page
+		$page,
+		$locale
 	) {
 		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
 		if ( ! $site_classification_mapping ) {
@@ -783,7 +791,8 @@ class SiteGen {
 				array(
 					'site_description' => $site_description,
 				),
-				'siteclassificationmapping'
+				'siteclassificationmapping',
+				$locale
 			);
 		}
 
@@ -851,6 +860,7 @@ class SiteGen {
 						'page'          => $page,
 						'primaryType'   => $primary_type,
 						'secondaryType' => $secondary_type,
+						'locale'        => $locale
 					)
 				),
 			)
@@ -897,6 +907,7 @@ class SiteGen {
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
 	 * @param array   $site_map         The site map
+	 * @param string  $locale           The site content's locale.
 	 * @param boolean $skip_cache       To skip or not to skip
 	 */
 	public static function get_pages(
@@ -904,6 +915,7 @@ class SiteGen {
 		$content_style,
 		$target_audience,
 		$site_map,
+		$locale,
 		$skip_cache = false
 	) {
 		if ( ! self::check_capabilities() ) {
@@ -938,7 +950,8 @@ class SiteGen {
 				$content_style,
 				$target_audience,
 				$keywords,
-				$page
+				$page,
+				$locale
 			);
 
 			$pages_content[ $page ] = $response;
