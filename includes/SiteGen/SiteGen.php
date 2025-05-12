@@ -861,7 +861,7 @@ class SiteGen {
 						'page'          => $page,
 						'primaryType'   => $primary_type,
 						'secondaryType' => $secondary_type,
-						'locale'        => $locale
+						'locale'        => $locale,
 					)
 				),
 			)
