@@ -642,7 +642,8 @@ class SiteGen {
 				array(
 					'site_description' => $site_description,
 				),
-				'siteclassificationmapping'
+				'siteclassificationmapping',
+				$locale
 			);
 		}
 		// check if custom hero patterns needs to be added
