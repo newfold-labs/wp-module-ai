@@ -487,6 +487,11 @@ class SiteGen {
 
 		self::cache_sitegen_response( $identifier, $parsed_response );
 
+		// Save the color palette and font pair to a separate option to be used later by the editor
+		if ( 'colorpalette' === $identifier || 'fontpair' === $identifier ) {
+			\update_option( 'nfd_module_onboarding_editor_' . $identifier, $parsed_response );
+		}
+
 		if ( 'siteclassification' === $identifier ) {
 			// fetch site classification mapping for generating posts
 			$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
