@@ -9,6 +9,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2025-02-17T17:21:08+00:00\n"
 "PO-Revision-Date: 2025-02-19 17:05\n"
+"Language: fr_FR\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wp-module-ai\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -17,9 +18,8 @@ msgstr ""
 "X-Crowdin-Language: fr\n"
 "X-Crowdin-File: wp-module-ai.pot\n"
 "X-Crowdin-File-ID: 56\n"
-"Language: fr_FR\n"
 
-#: bootstrap.php:28
+#: bootstrap.php:29
 msgid "ai"
 msgstr "ai"
 
@@ -37,10 +37,10 @@ msgstr "Vous devez être authentifié pour passer cet appel"
 #: includes/SiteGen/SiteGen.php:476
 #: includes/SiteGen/SiteGen.php:481
 #: includes/SiteGen/SiteGen.php:514
-#: includes/SiteGen/SiteGen.php:593
-#: includes/SiteGen/SiteGen.php:598
-#: includes/SiteGen/SiteGen.php:851
-#: includes/SiteGen/SiteGen.php:856
+#: includes/SiteGen/SiteGen.php:605
+#: includes/SiteGen/SiteGen.php:610
+#: includes/SiteGen/SiteGen.php:874
+#: includes/SiteGen/SiteGen.php:879
 #: includes/Utils/AISearchUtil.php:53
 #: includes/Utils/AISearchUtil.php:77
 #: includes/Utils/AISearchUtil.php:85
@@ -53,7 +53,7 @@ msgstr "Nous ne pouvons pas traiter la demande pour le moment"
 
 #: includes/SiteGen/SiteGen.php:424
 #: includes/SiteGen/SiteGen.php:531
-#: includes/SiteGen/SiteGen.php:888
+#: includes/SiteGen/SiteGen.php:911
 msgid "You do not have the permissions to perform this action"
 msgstr "Vous n'avez pas les permissions pour effectuer cette action"
 
@@ -61,3 +61,48 @@ msgstr "Vous n'avez pas les permissions pour effectuer cette action"
 msgid "Required values not provided"
 msgstr "Valeurs requises non fournies"
 
+#: includes/NFD_CLI.php:39
+msgid "No action provided"
+msgstr "Aucune action spécifiée"
+
+#: includes/NFD_CLI.php:40
+msgid "Usage: wp newfold ai enable <Hiive Token>"
+msgstr "Utilisation : wp newfold ai enable <Jeton Hiive>"
+
+#: includes/NFD_CLI.php:41
+msgid "wp newfold ai disable"
+msgstr "wp newfold ai disable"
+
+#: includes/NFD_CLI.php:55
+msgid "Hiive token not provided. Cannot enable AI capabilities."
+msgstr "Jeton Hiive non fourni. Impossible d’activer les fonctionnalités IA."
+
+#: includes/NFD_CLI.php:78
+#: includes/NFD_CLI.php:106
+msgid "Failed to initialize the WP Filesystem."
+msgstr "Échec de l’initialisation du système de fichiers WP."
+
+#: includes/NFD_CLI.php:83
+msgid "Could not enable AI capabilities."
+msgstr "Impossible d’activer les fonctionnalités IA."
+
+#: includes/NFD_CLI.php:85
+msgid "AI Capabilities Enabled."
+msgstr "Fonctionnalités IA activées."
+
+#: includes/NFD_CLI.php:89
+msgid "Hiive token encrypted and saved."
+msgstr "Jeton Hiive chiffré et enregistré."
+
+#: includes/NFD_CLI.php:111
+#: includes/NFD_CLI.php:116
+msgid "Could not disable AI capabilities."
+msgstr "Impossible de désactiver les fonctionnalités IA."
+
+#: includes/NFD_CLI.php:118
+msgid "AI Capabilities Disabled."
+msgstr "Fonctionnalités IA désactivées."
+
+#: includes/NFD_CLI.php:122
+msgid "Hiive token deleted."
+msgstr "Jeton Hiive supprimé."
