@@ -2,3 +2,6 @@ vendor/
 .idea/
 node_modules/
 .vscode/
+
+# GitHub Action related files and directories
+/translation-action-scripts
