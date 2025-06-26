@@ -947,7 +947,8 @@ class SiteGen {
 			$page     = $site_menu_options['slug'];
 			$keywords = $site_menu_options['keywords'];
 
-			if ( strcmp( $site_menu_options['slug'], 'home' ) === 0 ) {
+			// Skip home pages.
+			if ( 'home' === $site_menu_options['slug'] || 'home' === strtolower( $site_menu_options['title'] ) ) {
 				continue;
 			}
 
