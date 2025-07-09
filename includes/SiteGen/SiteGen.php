@@ -246,6 +246,8 @@ class SiteGen {
 	 */
 	private static function generate_pattern_content(
 		$site_description,
+		$site_type,
+		$locale,
 		$content_style,
 		$target_audience,
 		$content_structures,
@@ -263,7 +265,9 @@ class SiteGen {
 				'site_description' => $site_description,
 				'content_style'    => $content_style,
 			),
-			'keywords'
+			'keywords',
+			$site_type,
+			$locale
 		);
 
 		$unique_categories = array();
@@ -416,10 +420,11 @@ class SiteGen {
 	 *
 	 * @param array   $site_info  The Site Info object, will be validated for required params.
 	 * @param string  $identifier The identifier for generating the site meta
+	 * @param string  $site_type  The type of site.
 	 * @param string  $locale     The locale for site's content.
 	 * @param boolean $skip_cache To skip returning the response from cache
 	 */
-	public static function generate_site_meta( $site_info, $identifier, $locale, $skip_cache = false ) {
+	public static function generate_site_meta( $site_info, $identifier, $site_type, $locale, $skip_cache = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -453,6 +458,7 @@ class SiteGen {
 						'hiivetoken' => HiiveConnection::get_auth_token(),
 						'prompt'     => $refined_description,
 						'identifier' => $identifier,
+						'siteType'   => $site_type,
 						'locale'     => $locale,
 					)
 				),
@@ -503,6 +509,7 @@ class SiteGen {
 						'site_description' => $site_info['site_description'],
 					),
 					'siteclassificationmapping',
+					$site_type,
 					$locale,
 				);
 			}
@@ -529,12 +536,13 @@ class SiteGen {
 	 * Set regenerate to get new combinations
 	 *
 	 * @param string  $site_description The site description (user prompt).
+	 * @param string  $site_type        The type of site.
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
 	 * @param string  $locale           The locale for site's content.
 	 * @param boolean $regenerate       If we need to regenerate.
 	 */
-	public static function get_home_pages( $site_description, $content_style, $target_audience, $locale, $regenerate = false ) {
+	public static function get_home_pages( $site_description, $site_type, $content_style, $target_audience, $locale, $regenerate = false ) {
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -560,7 +568,8 @@ class SiteGen {
 				'content_style'    => $content_style,
 			),
 			'keywords',
-			$locale,
+			$site_type,
+			$locale
 		);
 
 		// Site classification: primary and secondary types
@@ -648,6 +657,7 @@ class SiteGen {
 					'site_description' => $site_description,
 				),
 				'siteclassificationmapping',
+				$site_type,
 				$locale
 			);
 		}
@@ -785,6 +795,7 @@ class SiteGen {
 	 */
 	public static function get_content_for_page(
 		$site_description,
+		$site_type,
 		$content_style,
 		$target_audience,
 		$keywords,
@@ -798,6 +809,7 @@ class SiteGen {
 					'site_description' => $site_description,
 				),
 				'siteclassificationmapping',
+				$site_type,
 				$locale
 			);
 		}
@@ -918,6 +930,7 @@ class SiteGen {
 	 */
 	public static function get_pages(
 		$site_description,
+		$site_type,
 		$content_style,
 		$target_audience,
 		$site_map,
@@ -953,6 +966,7 @@ class SiteGen {
 
 			$response = self::get_content_for_page(
 				$site_description,
+				$site_type,
 				$content_style,
 				$target_audience,
 				$keywords,
