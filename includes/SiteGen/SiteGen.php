@@ -238,11 +238,13 @@ class SiteGen {
 	/**
 	 * Function to generate all possible patterns for the current generation.
 	 *
-	 * @param string  $site_description  The site description (the user prompt)
-	 * @param array   $content_style     The generated content style.
-	 * @param array   $target_audience   The generated target audience.
+	 * @param string  $site_description   The site description (the user prompt)
+	 * @param string  $site_type          The type of site. (eg: business, ecommerce, personal)
+	 * @param string  $locale             The locale for site's content.
+	 * @param array   $content_style      The generated content style.
+	 * @param array   $target_audience    The generated target audience.
 	 * @param array   $content_structures The content structures generated / cached
-	 * @param boolean $skip_cache        If we need to skip cache.
+	 * @param boolean $skip_cache         If we need to skip cache.
 	 */
 	private static function generate_pattern_content(
 		$site_description,
@@ -787,10 +789,11 @@ class SiteGen {
 	 * Function to get the content for a page
 	 *
 	 * @param string $site_description The site description (user prompt).
+	 * @param string $site_type        The type of site. (eg: business, ecommerce, personal)
 	 * @param array  $content_style    Generated from sitegen.
 	 * @param array  $target_audience  Generated target audience.
 	 * @param array  $keywords         Generated keywords for page.
-	 * @param string $page             The page
+	 * @param string $page             The page slug
 	 * @param string $locale           The site content's locale.
 	 */
 	public static function get_content_for_page(
@@ -922,6 +925,7 @@ class SiteGen {
 	 * Function to get the page patterns
 	 *
 	 * @param string  $site_description The site description (user prompt).
+	 * @param string  $site_type        The type of site. (eg: business, ecommerce, personal)
 	 * @param array   $content_style    Generated from sitegen.
 	 * @param array   $target_audience  Generated target audience.
 	 * @param array   $site_map         The site map
