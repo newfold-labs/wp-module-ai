@@ -9,12 +9,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2025-02-17T17:21:08+00:00\n"
 "PO-Revision-Date: 2025-02-17 22:52+0530\n"
+"Language: en_AU\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wp-module-ai\n"
-"Language: en_AU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: bootstrap.php:28
+#: bootstrap.php:29
 msgid "ai"
 msgstr "ai"
 
@@ -27,22 +27,31 @@ msgstr "You are not authorized to make this call"
 msgid "You must be authenticated to make this call"
 msgstr "You must be authenticated to make this call"
 
-#: includes/SiteGen/SiteGen.php:182 includes/SiteGen/SiteGen.php:224
-#: includes/SiteGen/SiteGen.php:476 includes/SiteGen/SiteGen.php:481
-#: includes/SiteGen/SiteGen.php:514 includes/SiteGen/SiteGen.php:593
-#: includes/SiteGen/SiteGen.php:598 includes/SiteGen/SiteGen.php:851
-#: includes/SiteGen/SiteGen.php:856 includes/Utils/AISearchUtil.php:53
-#: includes/Utils/AISearchUtil.php:77 includes/Utils/AISearchUtil.php:85
-#: includes/Utils/AISearchUtil.php:96 includes/Utils/AISearchUtil.php:110
-#: includes/Utils/AISearchUtil.php:131 includes/Utils/AISearchUtil.php:143
+#: includes/SiteGen/SiteGen.php:182
+#: includes/SiteGen/SiteGen.php:224
+#: includes/SiteGen/SiteGen.php:366
+#: includes/SiteGen/SiteGen.php:371
+#: includes/SiteGen/SiteGen.php:411
+#: includes/SiteGen/SiteGen.php:507
+#: includes/SiteGen/SiteGen.php:512
+#: includes/SiteGen/SiteGen.php:785
+#: includes/SiteGen/SiteGen.php:790
+#: includes/Utils/AISearchUtil.php:53
+#: includes/Utils/AISearchUtil.php:77
+#: includes/Utils/AISearchUtil.php:85
+#: includes/Utils/AISearchUtil.php:96
+#: includes/Utils/AISearchUtil.php:110
+#: includes/Utils/AISearchUtil.php:131
+#: includes/Utils/AISearchUtil.php:143
 msgid "We are unable to process the request at this moment"
 msgstr "We are unable to process the request at this moment"
 
-#: includes/SiteGen/SiteGen.php:424 includes/SiteGen/SiteGen.php:531
-#: includes/SiteGen/SiteGen.php:888
+#: includes/SiteGen/SiteGen.php:312
+#: includes/SiteGen/SiteGen.php:430
+#: includes/SiteGen/SiteGen.php:826
 msgid "You do not have the permissions to perform this action"
 msgstr "You do not have the permissions to perform this action"
 
-#: includes/SiteGen/SiteGen.php:430
+#: includes/SiteGen/SiteGen.php:318
 msgid "Required values not provided"
 msgstr "Required values not provided"
