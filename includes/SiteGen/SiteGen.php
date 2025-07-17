@@ -45,7 +45,6 @@ class SiteGen {
 		),
 		'keywords'                  => array(
 			'site_description',
-			'content_style',
 		),
 		'siteconfig'                => array(
 			'site_description',
@@ -69,7 +68,7 @@ class SiteGen {
 	 *
 	 * @param string $site_description The site description
 	 */
-	private static function get_refined_site_description( $site_description ) {
+	public static function get_refined_site_description( $site_description ) {
 		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
 		if ( $refined_description ) {
 			return $refined_description;
