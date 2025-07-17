@@ -36,9 +36,9 @@ final class NFD_CLI {
 				self::disable();
 				break;
 			default:
-				\WP_CLI::warning( 'No action provided' );
-				\WP_CLI::log( 'Usage: wp newfold ai enable <Hiive Token>' );
-				\WP_CLI::log( '       wp newfold ai disable' );
+				\WP_CLI::warning( __( 'No action provided', 'wp-module-ai' ) );
+				\WP_CLI::log( __( 'Usage: wp newfold ai enable <Hiive Token>', 'wp-module-ai' ) );
+				\WP_CLI::log( __( 'wp newfold ai disable', 'wp-module-ai' ) );
 				break;
 		}
 	}
@@ -52,7 +52,7 @@ final class NFD_CLI {
 	private static function enable( $token ) {
 
 		if ( empty( $token ) ) {
-			\WP_CLI::error( 'Hiive token not provided. Cannot enable AI capabilities.' );
+			\WP_CLI::error( __( 'Hiive token not provided. Cannot enable AI capabilities.', 'wp-module-ai' ) );
 			return;
 		}
 
@@ -75,18 +75,18 @@ final class NFD_CLI {
 		global $wp_filesystem;
 
 		if ( ! $wp_filesystem ) {
-			WP_CLI::error( 'Failed to initialize the WP Filesystem.' );
+			WP_CLI::error( __( 'Failed to initialize the WP Filesystem.', 'wp-module-ai' ) );
 		}
 
 		// create a php file that overrides the AI capabilities
 		if ( $wp_filesystem->put_contents( self::capabilities_file_path(), $enable_ai_filter ) === false ) {
-			\WP_CLI::error( 'Could not enable AI capabilities.' );
+			\WP_CLI::error( __( 'Could not enable AI capabilities.', 'wp-module-ai' ) );
 		}
-		\WP_CLI::success( 'AI Capabilities Enabled.' );
+		\WP_CLI::success( __( 'AI Capabilities Enabled.', 'wp-module-ai' ) );
 
 		// Update the hiive token in the option, it gets automatically encrypted while saving and decrypted while reading
 		if ( update_option( 'nfd_data_token', $token ) ) {
-			\WP_CLI::success( 'Hiive token encrypted and saved.' );
+			\WP_CLI::success( __( 'Hiive token encrypted and saved.', 'wp-module-ai' ) );
 		}
 	}
 
@@ -103,23 +103,23 @@ final class NFD_CLI {
 		global $wp_filesystem;
 
 		if ( ! $wp_filesystem ) {
-			WP_CLI::error( 'Failed to initialize the WP Filesystem.' );
+			WP_CLI::error( __( 'Failed to initialize the WP Filesystem.', 'wp-module-ai' ) );
 		}
 
 		// Check if the file exists
 		if ( ! $wp_filesystem->exists( self::capabilities_file_path() ) ) {
-			WP_CLI::error( 'Could not disable AI capabilities.' );
+			WP_CLI::error( __( 'Could not disable AI capabilities.', 'wp-module-ai' ) );
 		}
 
 		// delete the php file that overrides the AI capabilities
 		if ( ! $wp_filesystem->delete( self::capabilities_file_path() ) ) {
-			\WP_CLI::error( 'Could not disable AI capabilities.' );
+			\WP_CLI::error( __( 'Could not disable AI capabilities.', 'wp-module-ai' ) );
 		}
-		\WP_CLI::success( 'AI Capabilities Disabled.' );
+		\WP_CLI::success( __( 'AI Capabilities Disabled.', 'wp-module-ai' ) );
 
 		// delete the Hiive token
 		if ( delete_option( 'nfd_data_token' ) ) {
-			\WP_CLI::success( 'Hiive token deleted.' );
+			\WP_CLI::success( __( 'Hiive token deleted.', 'wp-module-ai' ) );
 		}
 	}
 }
