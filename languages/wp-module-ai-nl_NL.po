@@ -9,6 +9,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2025-02-17T17:21:08+00:00\n"
 "PO-Revision-Date: 2025-02-19 17:05\n"
+"Language: nl_NL\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: wp-module-ai\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -17,9 +18,8 @@ msgstr ""
 "X-Crowdin-Language: nl\n"
 "X-Crowdin-File: wp-module-ai.pot\n"
 "X-Crowdin-File-ID: 56\n"
-"Language: nl_NL\n"
 
-#: bootstrap.php:28
+#: bootstrap.php:29
 msgid "ai"
 msgstr "ai"
 
@@ -32,15 +32,15 @@ msgstr "Je bent niet geautoriseerd om deze oproep te doen"
 msgid "You must be authenticated to make this call"
 msgstr "U moet geverifieerd zijn om deze oproep te kunnen doen"
 
-#: includes/SiteGen/SiteGen.php:182
-#: includes/SiteGen/SiteGen.php:224
-#: includes/SiteGen/SiteGen.php:476
-#: includes/SiteGen/SiteGen.php:481
-#: includes/SiteGen/SiteGen.php:514
-#: includes/SiteGen/SiteGen.php:593
-#: includes/SiteGen/SiteGen.php:598
-#: includes/SiteGen/SiteGen.php:851
-#: includes/SiteGen/SiteGen.php:856
+#: includes/SiteGen/SiteGen.php:181
+#: includes/SiteGen/SiteGen.php:223
+#: includes/SiteGen/SiteGen.php:365
+#: includes/SiteGen/SiteGen.php:370
+#: includes/SiteGen/SiteGen.php:410
+#: includes/SiteGen/SiteGen.php:506
+#: includes/SiteGen/SiteGen.php:511
+#: includes/SiteGen/SiteGen.php:784
+#: includes/SiteGen/SiteGen.php:789
 #: includes/Utils/AISearchUtil.php:53
 #: includes/Utils/AISearchUtil.php:77
 #: includes/Utils/AISearchUtil.php:85
@@ -51,13 +51,12 @@ msgstr "U moet geverifieerd zijn om deze oproep te kunnen doen"
 msgid "We are unable to process the request at this moment"
 msgstr "We kunnen het verzoek momenteel niet verwerken"
 
-#: includes/SiteGen/SiteGen.php:424
-#: includes/SiteGen/SiteGen.php:531
-#: includes/SiteGen/SiteGen.php:888
+#: includes/SiteGen/SiteGen.php:311
+#: includes/SiteGen/SiteGen.php:429
+#: includes/SiteGen/SiteGen.php:825
 msgid "You do not have the permissions to perform this action"
 msgstr "U heeft geen rechten om deze actie uit te voeren"
 
-#: includes/SiteGen/SiteGen.php:430
+#: includes/SiteGen/SiteGen.php:317
 msgid "Required values not provided"
 msgstr "Vereiste waarden niet verstrekt"
-
