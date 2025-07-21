@@ -32,15 +32,15 @@ msgstr "Du bist nicht berechtigt, diesen Aufruf durchzuführen"
 msgid "You must be authenticated to make this call"
 msgstr "Du musst authentifiziert sein, um diesen Aufruf durchzuführen"
 
-#: includes/SiteGen/SiteGen.php:182
-#: includes/SiteGen/SiteGen.php:224
-#: includes/SiteGen/SiteGen.php:476
-#: includes/SiteGen/SiteGen.php:481
-#: includes/SiteGen/SiteGen.php:514
-#: includes/SiteGen/SiteGen.php:605
-#: includes/SiteGen/SiteGen.php:610
-#: includes/SiteGen/SiteGen.php:874
-#: includes/SiteGen/SiteGen.php:879
+#: includes/SiteGen/SiteGen.php:181
+#: includes/SiteGen/SiteGen.php:223
+#: includes/SiteGen/SiteGen.php:365
+#: includes/SiteGen/SiteGen.php:370
+#: includes/SiteGen/SiteGen.php:410
+#: includes/SiteGen/SiteGen.php:506
+#: includes/SiteGen/SiteGen.php:511
+#: includes/SiteGen/SiteGen.php:784
+#: includes/SiteGen/SiteGen.php:789
 #: includes/Utils/AISearchUtil.php:53
 #: includes/Utils/AISearchUtil.php:77
 #: includes/Utils/AISearchUtil.php:85
@@ -51,13 +51,13 @@ msgstr "Du musst authentifiziert sein, um diesen Aufruf durchzuführen"
 msgid "We are unable to process the request at this moment"
 msgstr "Wir können die Anfrage im Moment nicht bearbeiten"
 
-#: includes/SiteGen/SiteGen.php:424
-#: includes/SiteGen/SiteGen.php:531
-#: includes/SiteGen/SiteGen.php:911
+#: includes/SiteGen/SiteGen.php:311
+#: includes/SiteGen/SiteGen.php:429
+#: includes/SiteGen/SiteGen.php:825
 msgid "You do not have the permissions to perform this action"
 msgstr "Du hast keine Berechtigung, diese Aktion durchzuführen"
 
-#: includes/SiteGen/SiteGen.php:430
+#: includes/SiteGen/SiteGen.php:317
 msgid "Required values not provided"
 msgstr "Erforderliche Werte wurden nicht angegeben"
 
