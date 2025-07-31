@@ -395,7 +395,13 @@ class SiteGen {
 				);
 			}
 
-			if ( true === $site_classification_mapping['blog-posts-custom'][ $parsed_response['primaryType'] ][ $parsed_response['slug'] ] ) {
+			$primary_type = $parsed_response['primaryType'] ?? null;
+			$slug         = $parsed_response['slug'] ?? null;
+			if (
+				$primary_type &&
+				$slug &&
+				true === ( $site_classification_mapping['blog-posts-custom'][ $primary_type ][ $slug ] ?? false )
+			) {
 				self::generate_site_posts( $site_info, $parsed_response );
 			}
 		}
