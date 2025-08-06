@@ -35,17 +35,17 @@ msgstr "Vous devez être authentifié pour passer cet appel"
 
 #: includes/SiteGen/SiteGen.php:181 includes/SiteGen/SiteGen.php:223
 #: includes/SiteGen/SiteGen.php:365 includes/SiteGen/SiteGen.php:370
-#: includes/SiteGen/SiteGen.php:410 includes/SiteGen/SiteGen.php:506
-#: includes/SiteGen/SiteGen.php:511 includes/SiteGen/SiteGen.php:784
-#: includes/SiteGen/SiteGen.php:789 includes/Utils/AISearchUtil.php:53
+#: includes/SiteGen/SiteGen.php:416 includes/SiteGen/SiteGen.php:512
+#: includes/SiteGen/SiteGen.php:517 includes/SiteGen/SiteGen.php:790
+#: includes/SiteGen/SiteGen.php:795 includes/Utils/AISearchUtil.php:53
 #: includes/Utils/AISearchUtil.php:77 includes/Utils/AISearchUtil.php:85
 #: includes/Utils/AISearchUtil.php:96 includes/Utils/AISearchUtil.php:110
 #: includes/Utils/AISearchUtil.php:131 includes/Utils/AISearchUtil.php:143
 msgid "We are unable to process the request at this moment"
 msgstr "Nous ne pouvons pas traiter la demande pour le moment"
 
-#: includes/SiteGen/SiteGen.php:311 includes/SiteGen/SiteGen.php:429
-#: includes/SiteGen/SiteGen.php:825
+#: includes/SiteGen/SiteGen.php:311 includes/SiteGen/SiteGen.php:435
+#: includes/SiteGen/SiteGen.php:831
 msgid "You do not have the permissions to perform this action"
 msgstr "Vous n'avez pas les permissions pour effectuer cette action"
 
