@@ -675,19 +675,16 @@ class SiteGen {
 	 *
 	 * @param string $site_description The site description (user prompt).
 	 * @param string $site_type        The type of site. (eg: business, ecommerce, personal)
-	 * @param array  $content_style    Generated from sitegen.
-	 * @param array  $target_audience  Generated target audience.
-	 * @param array  $keywords         Generated keywords for page.
 	 * @param string $page             The page slug
 	 * @param string $locale           The site content's locale.
 	 *
 	 * @return string|false The page content or false if the page content was not created
 	 */
 	public static function get_static_page_content(
-		$site_description,
-		$site_type,
-		$page,
-		$locale
+		string $site_description,
+		string $site_type,
+		string $page,
+		string $locale
 	) {
 		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
 		if ( ! $site_classification_mapping ) {
@@ -741,14 +738,16 @@ class SiteGen {
 	}
 
 	/**
-	 * Function to generate the content for a page
+	 * Function to generate the content for a page.
 	 *
-	 * @param array $pages The pages to generate
+	 * @param array  $pages           The pages to generate.
 	 * @param string $site_description The site description (user prompt).
-	 * @param string $site_type The type of site. (eg: business, ecommerce, personal)
-	 * @param string $locale The site content's locale.
+	 * @param string $site_type       The type of site. (eg: business, ecommerce, personal).
+	 * @param array  $content_style   The content style.
+	 * @param array  $target_audience The target audience.
+	 * @param string $locale          The site content's locale.
 	 *
-	 * @return array The pages content
+	 * @return array The pages content.
 	 */
 	private static function generate_pages_content( array $pages, string $site_description, string $site_type, $content_style, $target_audience, string $locale ): array {
 		// Site classification: primary and secondary types
@@ -763,8 +762,8 @@ class SiteGen {
 		$requests = array();
 		foreach ( $pages as $page_slug => $page_data ) {
 			$requests[ $page_slug ] = array(
-				'url' => NFD_CONTENT_GENERATION_BASE . 'page',
-				'type' => 'POST',
+				'url'     => NFD_CONTENT_GENERATION_BASE . 'page',
+				'type'    => 'POST',
 				'headers' => array(
 					'Content-Type'  => 'application/json',
 					'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
@@ -789,36 +788,42 @@ class SiteGen {
 
 		// Generate pages in parallel
 		$pages_content = array();
-		\WpOrg\Requests\Requests::request_multiple( $requests, array(
-			'timeout' => 60,
-			'complete' => function(
-				\WpOrg\Requests\Response | \WpOrg\Requests\Exception $response,
-				string $page_slug
-			) use ( &$pages_content, $pages ) {
-				if ( $response instanceof \WpOrg\Requests\Response && $response->success ) {
-					// On success
-					$parsed_response = json_decode( $response->body, true );
-					$generated_page  = '';
-					if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-						foreach ( $parsed_response['content'] as $pattern_content ) {
-							$generated_page .= $pattern_content['replacedPattern'];
+		\WpOrg\Requests\Requests::request_multiple(
+			$requests,
+			array(
+				'timeout'  => 60,
+				'complete' => function (
+					\WpOrg\Requests\Response|\WpOrg\Requests\Exception $response,
+					string $page_slug
+				) use (
+					&$pages_content,
+					$pages
+				) {
+					if ( $response instanceof \WpOrg\Requests\Response && $response->success ) {
+						// On success
+						$parsed_response = json_decode( $response->body, true );
+						$generated_page  = '';
+						if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
+							foreach ( $parsed_response['content'] as $pattern_content ) {
+								$generated_page .= $pattern_content['replacedPattern'];
+							}
+							$pages_content[ $page_slug ] = array(
+								'order'   => $pages[ $page_slug ]['order'],
+								'content' => $generated_page,
+							);
 						}
-						$pages_content[ $page_slug ] = array(
-							'order'   => $pages[ $page_slug ]['order'],
-							'content' => $generated_page,
-						);
+					} elseif ( $response instanceof \WpOrg\Requests\Response && ! $response->success ) {
+						// On error Response
+						$code    = 'status_code ' . $response->status_code;
+						$message = $response->body;
+						error_log( 'Response Error generating page content: ' . $code . ' - ' . $message );
+					} elseif ( $response instanceof \WpOrg\Requests\Exception ) {
+						// On exception
+						error_log( 'Exception Error generating page content: ' . $response->getMessage() );
 					}
-				} elseif ( $response instanceof \WpOrg\Requests\Response && ! $response->success ) {
-					// On error Response
-					$code    = 'status_code ' . $response->status_code;
-					$message = $response->body;
-					error_log( 'Response Error generating page content: ' . $code . ' - ' . $message );
-				} elseif ( $response instanceof \WpOrg\Requests\Exception ) {
-					// On exception
-					error_log( 'Exception Error generating page content: ' . $response->getMessage() );
-				}
-			},
-		) );
+				},
+			)
+		);
 
 		return $pages_content;
 	}
@@ -886,20 +891,20 @@ class SiteGen {
 					$locale
 				);
 				if ( null !== $response ) {
-					$pages_content[ $page ] = [
+					$pages_content[ $page ] = array(
 						'order'   => $order,
 						'content' => $response,
-					];
+					);
 					continue;
 				}
 			}
 
 			// Generate pages that require AI generated content
-			$pages_for_ai_generation[ $page ] = [
+			$pages_for_ai_generation[ $page ] = array(
 				'order'    => $order,
 				'page'     => $page,
 				'keywords' => $keywords,
-			];
+			);
 		}
 
 		// Merge static and AI generated pages
@@ -918,14 +923,14 @@ class SiteGen {
 		// Reorder pages by their original order
 		uasort(
 			$pages_content,
-			function( $a, $b ) {
+			function ( $a, $b ) {
 				return $a['order'] <=> $b['order'];
 			}
 		);
 
 		// Get only the content of the pages
 		$result = array_map(
-			function( $item ) {
+			function ( $item ) {
 				return $item['content'];
 			},
 			$pages_content
