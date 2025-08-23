@@ -793,7 +793,7 @@ class SiteGen {
 			array(
 				'timeout'  => 60,
 				'complete' => function (
-					\WpOrg\Requests\Response|\WpOrg\Requests\Exception $response,
+					$response,
 					string $page_slug
 				) use (
 					&$pages_content,
