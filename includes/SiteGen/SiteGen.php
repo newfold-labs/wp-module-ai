@@ -678,7 +678,7 @@ class SiteGen {
 	 * @param string $page             The page slug
 	 * @param string $locale           The site content's locale.
 	 *
-	 * @return string|false The page content or false if the page content was not created
+	 * @return string|null The page content or null if the page content was not created
 	 */
 	public static function get_static_page_content(
 		string $site_description,
@@ -734,7 +734,7 @@ class SiteGen {
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
