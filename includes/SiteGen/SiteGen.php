@@ -675,20 +675,16 @@ class SiteGen {
 	 *
 	 * @param string $site_description The site description (user prompt).
 	 * @param string $site_type        The type of site. (eg: business, ecommerce, personal)
-	 * @param array  $content_style    Generated from sitegen.
-	 * @param array  $target_audience  Generated target audience.
-	 * @param array  $keywords         Generated keywords for page.
 	 * @param string $page             The page slug
 	 * @param string $locale           The site content's locale.
+	 *
+	 * @return string|null The page content or null if the page content was not created
 	 */
-	public static function get_content_for_page(
-		$site_description,
-		$site_type,
-		$content_style,
-		$target_audience,
-		$keywords,
-		$page,
-		$locale
+	public static function get_static_page_content(
+		string $site_description,
+		string $site_type,
+		string $page,
+		string $locale
 	) {
 		$site_classification_mapping = self::get_sitegen_from_cache( 'siteclassificationmapping' );
 		if ( ! $site_classification_mapping ) {
@@ -738,6 +734,22 @@ class SiteGen {
 			}
 		}
 
+		return null;
+	}
+
+	/**
+	 * Function to generate the content for a page.
+	 *
+	 * @param array  $pages           The pages to generate.
+	 * @param string $site_description The site description (user prompt).
+	 * @param string $site_type       The type of site. (eg: business, ecommerce, personal).
+	 * @param array  $content_style   The content style.
+	 * @param array  $target_audience The target audience.
+	 * @param string $locale          The site content's locale.
+	 *
+	 * @return array The pages content.
+	 */
+	private static function generate_pages_content( array $pages, string $site_description, string $site_type, $content_style, $target_audience, string $locale ): array {
 		// Site classification: primary and secondary types
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
 		$primary_type        = 'other';
@@ -747,63 +759,73 @@ class SiteGen {
 			$secondary_type = $site_classification['slug'] ?? 'other';
 		}
 
-		$response      = wp_remote_post(
-			NFD_CONTENT_GENERATION_BASE . 'page',
-			array(
+		$requests = array();
+		foreach ( $pages as $page_slug => $page_data ) {
+			$requests[ $page_slug ] = array(
+				'url'     => NFD_CONTENT_GENERATION_BASE . 'page',
+				'type'    => 'POST',
 				'headers' => array(
 					'Content-Type'  => 'application/json',
 					'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 				),
-				'timeout' => 60,
-				'body'    => wp_json_encode(
+				'data'    => wp_json_encode(
 					array(
 						'prompt'        => array(
 							'site_description' => $site_description,
-							'keywords'         => wp_json_encode( $keywords ),
+							'keywords'         => wp_json_encode( $page_data['keywords'] ),
 							'content_style'    => wp_json_encode( $content_style ),
 							'target_audience'  => wp_json_encode( $target_audience ),
 						),
-						'page'          => $page,
+						'site_type'     => $site_type,
+						'page'          => $page_slug,
 						'primaryType'   => $primary_type,
 						'secondaryType' => $secondary_type,
 						'locale'        => $locale,
 					)
 				),
+			);
+		}
+
+		// Generate pages in parallel
+		$pages_content = array();
+		\WpOrg\Requests\Requests::request_multiple(
+			$requests,
+			array(
+				'timeout'  => 60,
+				'complete' => function (
+					$response,
+					string $page_slug
+				) use (
+					&$pages_content,
+					$pages
+				) {
+					if ( $response instanceof \WpOrg\Requests\Response && $response->success ) {
+						// On success
+						$parsed_response = json_decode( $response->body, true );
+						$generated_page  = '';
+						if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
+							foreach ( $parsed_response['content'] as $pattern_content ) {
+								$generated_page .= $pattern_content['replacedPattern'];
+							}
+							$pages_content[ $page_slug ] = array(
+								'order'   => $pages[ $page_slug ]['order'],
+								'content' => $generated_page,
+							);
+						}
+					} elseif ( $response instanceof \WpOrg\Requests\Response && ! $response->success ) {
+						// On error Response
+						$code    = 'status_code ' . $response->status_code;
+						$message = $response->body;
+						error_log( 'Response Error generating page content: ' . $code . ' - ' . $message );
+					} elseif ( $response instanceof \WpOrg\Requests\Exception ) {
+						// On exception
+						error_log( 'Exception Error generating page content: ' . $response->getMessage() );
+					}
+				},
 			)
 		);
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( 200 !== $response_code ) {
-			if ( 400 === $response_code ) {
-				$error = json_decode( wp_remote_retrieve_body( $response ), true );
-				return array(
-					'error' => $error['payload']['reason'],
-				);
-			}
-			try {
-				$error = json_decode( wp_remote_retrieve_body( $response ), true );
-				if ( isset( $error ) && array_key_exists( 'payload', $error ) ) {
-					return array(
-						'error' => $error['payload'],
-					);
-				} else {
-					return array(
-						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
-					);
-				}
-			} catch ( \Exception $exception ) {
-				return array(
-					'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
-				);
-			}
-		}
-		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
-		$generated_page  = '';
-		if ( ! array_key_exists( 'error', $parsed_response['content'] ) ) {
-			foreach ( $parsed_response['content'] as $pattern_content ) {
-				$generated_page .= $pattern_content['replacedPattern'];
-			}
-		}
-		return $generated_page;
+
+		return $pages_content;
 	}
 
 	/**
@@ -816,6 +838,8 @@ class SiteGen {
 	 * @param array   $site_map         The site map
 	 * @param string  $locale           The site content's locale.
 	 * @param boolean $skip_cache       To skip or not to skip
+	 *
+	 * @return array The pages content
 	 */
 	public static function get_pages(
 		$site_description,
@@ -824,7 +848,7 @@ class SiteGen {
 		$target_audience,
 		$site_map,
 		$locale,
-		$skip_cache = false
+		$skip_cache = true
 	) {
 		if ( ! self::check_capabilities() ) {
 			return array(
@@ -843,28 +867,75 @@ class SiteGen {
 			}
 		}
 
+		// Pages for AI generation
+		$pages_for_ai_generation = array();
+		// Pages content results
 		$pages_content = array();
 
-		foreach ( $site_map as $site_menu => $site_menu_options ) {
-			$page     = $site_menu_options['slug'];
-			$keywords = $site_menu_options['keywords'];
+		foreach ( $site_map as $order => $menu_item ) {
+			$page     = $menu_item['slug'];
+			$path     = $menu_item['path'];
+			$keywords = $menu_item['keywords'];
 
-			if ( strcmp( $site_menu_options['slug'], 'home' ) === 0 ) {
+			// Skip home page
+			if ( 'home' === strtolower( $page ) || '/' === $path ) {
 				continue;
 			}
 
-			$response = self::get_content_for_page(
+			// Generate pages that don't require AI generated content
+			if ( 'contact' === $page || 'menu' === $page ) {
+				$response = self::get_static_page_content(
+					$site_description,
+					$site_type,
+					$page,
+					$locale
+				);
+				if ( null !== $response ) {
+					$pages_content[ $page ] = array(
+						'order'   => $order,
+						'content' => $response,
+					);
+					continue;
+				}
+			}
+
+			// Generate pages that require AI generated content
+			$pages_for_ai_generation[ $page ] = array(
+				'order'    => $order,
+				'page'     => $page,
+				'keywords' => $keywords,
+			);
+		}
+
+		// Merge static and AI generated pages
+		$pages_content = array_merge(
+			$pages_content,
+			self::generate_pages_content(
+				$pages_for_ai_generation,
 				$site_description,
 				$site_type,
 				$content_style,
 				$target_audience,
-				$keywords,
-				$page,
 				$locale
-			);
+			)
+		);
 
-			$pages_content[ $page ] = $response;
-		}
-		return $pages_content;
+		// Reorder pages by their original order
+		uasort(
+			$pages_content,
+			function ( $a, $b ) {
+				return $a['order'] <=> $b['order'];
+			}
+		);
+
+		// Get only the content of the pages
+		$result = array_map(
+			function ( $item ) {
+				return $item['content'];
+			},
+			$pages_content
+		);
+
+		return $result;
 	}
 }
