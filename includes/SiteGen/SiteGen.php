@@ -67,36 +67,40 @@ class SiteGen {
 	 * Function to refine the site description, i.e. translate and summarize when required
 	 *
 	 * @param string $site_description The site description
+	 * @param string $api The API version to use ('v1' or 'v2')
 	 */
-	public static function get_refined_site_description( $site_description ) {
-		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
+	public static function get_refined_site_description( $site_description, $api = 'v1' ) {
+		$cache_key = ( 'v2' === $api ) ? 'refinedSiteDescription-v2' : 'refinedSiteDescription';
+		$refined_description = self::get_sitegen_from_cache( $cache_key );
 		if ( $refined_description ) {
 			return $refined_description;
 		}
 
-		$response = wp_remote_post(
-			NFD_AI_BASE . 'refineSiteDescription',
-			array(
-				'headers' => array(
-					'Content-Type' => 'application/json',
-				),
-				'timeout' => 60,
-				'body'    => wp_json_encode(
-					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => $site_description,
-					)
-				),
-			)
-		);
+		// Determine endpoint based on API version
+		if ( 'v2' === $api ) {
+			$endpoint = NFD_SITE_META_BASE . 'generate/refinedescription';
+		} else {
+			$endpoint = NFD_AI_BASE . 'refineSiteDescription';
+		}
+
+		// Use the common method for making API requests
+		$response = self::make_site_meta_request( $endpoint, $site_description );
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
 			return $site_description;
 		}
 
-		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
-		self::cache_sitegen_response( 'refinedSiteDescription', $refined_description );
+		$refined_response = json_decode( wp_remote_retrieve_body( $response ), true );
+
+		// For v2 API, extract the 'refine' key if it exists
+		if ( 'v2' === $api && isset( $refined_response['refined'] ) ) {
+			$refined_description = $refined_response['refined'];
+		} else {
+			$refined_description = $refined_response;
+		}
+
+		self::cache_sitegen_response( $cache_key, $refined_description );
 		return $refined_description;
 	}
 
@@ -241,22 +245,34 @@ class SiteGen {
 	 * @param array $site_classification  The Site Classification object.
 	 */
 	public static function generate_site_posts( $site_info, $site_classification ) {
+		// Check API version constant to determine which API to use
+		$api = self::get_api_version();
+
+		// Determine endpoint and request body based on API version
+		if ( 'v2' === $api ) {
+			$endpoint = NFD_SITE_META_BASE . 'generate/generatesiteposts';
+			$request_body = array(
+				'hiivetoken' => HiiveConnection::get_auth_token(),
+				'prompt'     => self::get_prompt_from_info( $site_info ),
+			);
+		} else {
+			$endpoint = NFD_AI_BASE . 'generateSiteMeta';
+			$request_body = array(
+				'hiivetoken' => HiiveConnection::get_auth_token(),
+				'prompt'     => self::get_prompt_from_info( $site_info ),
+				'identifier' => 'generatesiteposts',
+			);
+		}
 
 		// Generate AI Post Title and Content
 		$site_posts = wp_remote_post(
-			NFD_AI_BASE . 'generateSiteMeta',
+			$endpoint,
 			array(
 				'headers' => array(
 					'Content-Type' => 'application/json',
 				),
 				'timeout' => 60,
-				'body'    => wp_json_encode(
-					array(
-						'hiivetoken' => HiiveConnection::get_auth_token(),
-						'prompt'     => self::get_prompt_from_info( $site_info ),
-						'identifier' => 'generatesiteposts',
-					)
-				),
+				'body'    => wp_json_encode( $request_body ),
 			)
 		);
 
@@ -306,6 +322,14 @@ class SiteGen {
 	 * @param boolean $skip_cache To skip returning the response from cache
 	 */
 	public static function generate_site_meta( $site_info, $identifier, $site_type, $locale, $skip_cache = false ) {
+		// Check API version constant to determine which API to use
+		$api = self::get_api_version();
+
+		// Use v2 API
+		if ( 'v2' === $api ) {
+			return self::generate_site_meta_v2( $site_info, $identifier, $site_type, $locale, $skip_cache );
+		}
+		
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -325,7 +349,7 @@ class SiteGen {
 			}
 		}
 
-		$refined_description = self::get_refined_site_description( $site_info['site_description'] );
+		$refined_description = self::get_refined_site_description( $site_info['site_description'], $api );
 
 		$response = wp_remote_post(
 			NFD_AI_BASE . 'generateSiteMeta',
@@ -444,7 +468,7 @@ class SiteGen {
 			}
 		}
 
-		$site_description = self::get_refined_site_description( $site_description );
+		$site_description = self::get_refined_site_description( $site_description, self::get_api_version() );
 
 		$generated_content_structures = self::get_sitegen_from_cache(
 			'contentStructures'
@@ -856,7 +880,7 @@ class SiteGen {
 			);
 		}
 
-		$site_description = self::get_refined_site_description( $site_description );
+		$site_description = self::get_refined_site_description( $site_description, self::get_api_version() );
 
 		$identifier = 'generatePages';
 
@@ -937,5 +961,268 @@ class SiteGen {
 		);
 
 		return $result;
+	}
+
+	/**
+	 * Function to generate the site meta using v2 API endpoint
+	 *
+	 * @param array   $site_info  The Site Info object, will be validated for required params.
+	 * @param string  $identifier The identifier for generating the site meta
+	 * @param string  $site_type  The type of site.
+	 * @param string  $locale     The locale for site's content.
+	 * @param boolean $skip_cache To skip returning the response from cache
+	 */
+	public static function generate_site_meta_v2( $site_info, $identifier, $site_type, $locale, $skip_cache = false ) {
+		// Step 1: Validate prerequisites
+		$validation_error = self::validate_prerequisites( $site_info, $identifier );
+		if ( $validation_error ) {
+			return $validation_error;
+		}
+
+		// Step 2: Check cache
+		$cached_data = self::get_cached_site_meta( $identifier, $skip_cache, 'v2' );
+		if ( $cached_data ) {
+			return $cached_data;
+		}
+
+		// Step 3: Prepare and make API request
+		$refined_description = self::get_refined_site_description( $site_info['site_description'], 'v2' );
+		// Extract the actual description if it's an array
+		if ( is_array( $refined_description ) && isset( $refined_description['refined'] ) ) {
+			$refined_description = $refined_description['refined'];
+		}
+
+		$endpoint = NFD_SITE_META_BASE . 'generate/' . $identifier;
+		$response = self::make_site_meta_request( $endpoint, $refined_description, $site_type, $locale );
+
+		// Step 4: Handle API response errors
+		$error_response = self::handle_api_response_errors( $response );
+		if ( $error_response ) {
+			return $error_response;
+		}
+
+		// Step 5: Parse and cache response
+		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
+		
+		// Check if the parsed response itself contains an error
+		if ( isset( $parsed_response['error'] ) ) {
+			return array(
+				'error' => $parsed_response['error'],
+			);
+		}
+
+		// Step 6: Handle special processing
+		$parsed_response = self::handle_special_processing( $identifier, $parsed_response, $site_info, $site_type, $locale );
+
+		self::cache_site_meta( $identifier, $parsed_response, 'v2' );
+
+		// Step 7: Trigger action hook
+		do_action( 'newfold/ai/sitemeta-' . strtolower( $identifier ) . ':generated', $parsed_response );
+
+		// Step 9: Return result
+		try {
+			return $parsed_response;
+		} catch ( \Exception $exception ) {
+			return array(
+				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
+			);
+		}
+	}
+
+	/**
+	 * Get the API version to use
+	 *
+	 * @return string 'v1' or 'v2'
+	 */
+	private static function get_api_version() {
+		return defined( 'NFD_AI_API_VERSION' ) ? NFD_AI_API_VERSION : 'v1';
+	}
+
+	/**
+	 * Validate prerequisites for site meta generation
+	 *
+	 * @param array  $site_info  The site information.
+	 * @param string $identifier The identifier.
+	 * @return array|null Returns error array if validation fails, null if passes.
+	 */
+	private static function validate_prerequisites( $site_info, $identifier ) {
+		if ( ! self::check_capabilities() ) {
+			return array(
+				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
+			);
+		}
+
+		if ( ! self::validate_site_info( $site_info, $identifier ) ) {
+			return array(
+				'error' => __( 'Required values not provided', 'wp-module-ai' ),
+			);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get cached site meta data
+	 *
+	 * @param string  $identifier  The identifier.
+	 * @param boolean $skip_cache  Whether to skip cache.
+	 * @param string  $api_version API version for cache key.
+	 * @return mixed|null Returns cached data or null if not found.
+	 */
+	private static function get_cached_site_meta( $identifier, $skip_cache, $api_version = 'v1' ) {
+		if ( $skip_cache ) {
+			return null;
+		}
+
+		$cache_key = strtolower( $identifier ) . ( 'v2' === $api_version ? '-v2' : '' );
+		return get_option( NFD_SITEGEN_OPTION . '-' . $cache_key, null );
+	}
+
+	/**
+	 * Make API request to generate site meta
+	 *
+	 * @param string $endpoint     The API endpoint.
+	 * @param string $description  The refined description.
+	 * @param string $site_type    Optional. The site type.
+	 * @param string $locale       Optional. The locale.
+	 * @return array|\WP_Error API response or error array.
+	 */
+	private static function make_site_meta_request( $endpoint, $description, $site_type = '', $locale = '' ) {
+		// V2 API uses Authorization Bearer header
+		$headers = array(
+			'Content-Type'  => 'application/json',
+			'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
+		);
+		$request_body = array_filter(
+			array(
+				'site_description' => $description,
+				'siteType'         => $site_type,
+				'locale'           => $locale,
+			)
+		);
+
+		$response = wp_remote_post(
+			$endpoint,
+			array(
+				'headers' => $headers,
+				'timeout' => 60,
+				'body'    => wp_json_encode( $request_body ),
+			)
+		);
+
+		return $response;
+	}
+
+	/**
+	 * Handle API response errors
+	 *
+	 * @param mixed $response The API response.
+	 * @return array|null Returns error array if there's an error, null if success.
+	 */
+	private static function handle_api_response_errors( $response ) {
+		$response_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $response_code ) {
+			if ( 400 === $response_code ) {
+				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+				return array(
+					'error' => $error['payload']['reason'],
+				);
+			}
+
+			try {
+				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+				if ( array_key_exists( 'payload', $error ) ) {
+					return array(
+						'error' => $error['payload'],
+					);
+				} else {
+					return array(
+						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
+					);
+				}
+			} catch ( \Exception $exception ) {
+				return array(
+					'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
+				);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Cache the site meta response
+	 *
+	 * @param string $identifier   The identifier.
+	 * @param array  $data         The data to cache.
+	 * @param string $api_version  API version for cache key.
+	 */
+	private static function cache_site_meta( $identifier, $data, $api_version = 'v1' ) {
+		$cache_key = strtolower( $identifier ) . ( 'v2' === $api_version ? '-v2' : '' );
+		update_option( NFD_SITEGEN_OPTION . '-' . $cache_key, $data );
+	}
+
+	/**
+	 * Handle special post-processing for specific identifiers
+	 *
+	 * @param string $identifier     The identifier.
+	 * @param array  $parsed_response The parsed response.
+	 * @param array  $site_info      The original site info.
+	 * @param string $site_type      The site type.
+	 * @param string $locale         The locale.
+	 * @return array The processed response.
+	 */
+	private static function handle_special_processing( $identifier, $parsed_response, $site_info, $site_type, $locale ) {
+		// Handle fontpair flattening and save for editor
+		if ( 'fontpair' === $identifier ) {
+			if ( isset( $parsed_response['fontPairs'] ) ) {
+				$parsed_response = $parsed_response['fontPairs'];
+			}
+			\update_option( 'nfd_module_onboarding_editor_' . $identifier, $parsed_response );
+		}
+		
+		// Save color palette for editor
+		if ( 'colorpalette' === $identifier ) {
+			\update_option( 'nfd_module_onboarding_editor_' . $identifier, $parsed_response );
+		}
+
+		// Handle site classification special logic
+		if ( 'siteclassification' === $identifier ) {
+			$mapping_cache_key = 'siteclassificationmapping-v2';
+			$site_classification_mapping = get_option( NFD_SITEGEN_OPTION . '-' . $mapping_cache_key, null );
+			
+			if ( ! $site_classification_mapping ) {
+				// Direct API call for site classification mapping (static data)
+				$endpoint = NFD_SITE_META_BASE . 'siteclassificationmapping';
+				$response = wp_remote_get(
+					$endpoint,
+					array(
+						'headers' => array(
+							'Content-Type'  => 'application/json',
+							'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
+						),
+						'timeout' => 60,
+					)
+				);
+				
+				if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
+					$site_classification_mapping = json_decode( wp_remote_retrieve_body( $response ), true );
+					self::cache_site_meta( 'siteclassificationmapping', $site_classification_mapping, 'v2' );
+				}
+			}
+
+			$primary_type = $parsed_response['primaryType'] ?? null;
+			$slug         = $parsed_response['slug'] ?? null;
+			
+			if (
+				$primary_type &&
+				$slug &&
+				true === ( $site_classification_mapping['blog-posts-custom'][ $primary_type ][ $slug ] ?? false )
+			) {
+				self::generate_site_posts( $site_info, $parsed_response );
+			}
+		}
+		
+		return $parsed_response;
 	}
 }
