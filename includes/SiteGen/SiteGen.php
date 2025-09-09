@@ -70,7 +70,7 @@ class SiteGen {
 	 * @param string $api The API version to use ('v1' or 'v2')
 	 */
 	public static function get_refined_site_description( $site_description, $api = 'v1' ) {
-		$cache_key = ( 'v2' === $api ) ? 'refinedSiteDescription-v2' : 'refinedSiteDescription';
+		$cache_key           = ( 'v2' === $api ) ? 'refinedSiteDescription-v2' : 'refinedSiteDescription';
 		$refined_description = self::get_sitegen_from_cache( $cache_key );
 		if ( $refined_description ) {
 			return $refined_description;
@@ -250,13 +250,13 @@ class SiteGen {
 
 		// Determine endpoint and request body based on API version
 		if ( 'v2' === $api ) {
-			$endpoint = NFD_SITE_META_BASE . 'generate/generatesiteposts';
+			$endpoint     = NFD_SITE_META_BASE . 'generate/generatesiteposts';
 			$request_body = array(
 				'hiivetoken' => HiiveConnection::get_auth_token(),
 				'prompt'     => self::get_prompt_from_info( $site_info ),
 			);
 		} else {
-			$endpoint = NFD_AI_BASE . 'generateSiteMeta';
+			$endpoint     = NFD_AI_BASE . 'generateSiteMeta';
 			$request_body = array(
 				'hiivetoken' => HiiveConnection::get_auth_token(),
 				'prompt'     => self::get_prompt_from_info( $site_info ),
@@ -329,7 +329,7 @@ class SiteGen {
 		if ( 'v2' === $api ) {
 			return self::generate_site_meta_v2( $site_info, $identifier, $site_type, $locale, $skip_cache );
 		}
-		
+
 		if ( ! self::check_capabilities() ) {
 			return array(
 				'error' => __( 'You do not have the permissions to perform this action', 'wp-module-ai' ),
@@ -1003,7 +1003,7 @@ class SiteGen {
 
 		// Step 5: Parse and cache response
 		$parsed_response = json_decode( wp_remote_retrieve_body( $response ), true );
-		
+
 		// Check if the parsed response itself contains an error
 		if ( isset( $parsed_response['error'] ) ) {
 			return array(
@@ -1089,7 +1089,7 @@ class SiteGen {
 	 */
 	private static function make_site_meta_request( $endpoint, $description, $site_type = '', $locale = '' ) {
 		// V2 API uses Authorization Bearer header
-		$headers = array(
+		$headers      = array(
 			'Content-Type'  => 'application/json',
 			'Authorization' => 'Bearer ' . HiiveConnection::get_auth_token(),
 		);
@@ -1168,11 +1168,9 @@ class SiteGen {
 	 * @param string $identifier     The identifier.
 	 * @param array  $parsed_response The parsed response.
 	 * @param array  $site_info      The original site info.
-	 * @param string $site_type      The site type.
-	 * @param string $locale         The locale.
 	 * @return array The processed response.
 	 */
-	private static function handle_special_processing( $identifier, $parsed_response, $site_info, $site_type, $locale ) {
+	private static function handle_special_processing( $identifier, $parsed_response, $site_info ) {
 		// Handle fontpair flattening and save for editor
 		if ( 'fontpair' === $identifier ) {
 			if ( isset( $parsed_response['fontPairs'] ) ) {
@@ -1180,7 +1178,7 @@ class SiteGen {
 			}
 			\update_option( 'nfd_module_onboarding_editor_' . $identifier, $parsed_response );
 		}
-		
+
 		// Save color palette for editor
 		if ( 'colorpalette' === $identifier ) {
 			\update_option( 'nfd_module_onboarding_editor_' . $identifier, $parsed_response );
@@ -1188,9 +1186,9 @@ class SiteGen {
 
 		// Handle site classification special logic
 		if ( 'siteclassification' === $identifier ) {
-			$mapping_cache_key = 'siteclassificationmapping-v2';
+			$mapping_cache_key           = 'siteclassificationmapping-v2';
 			$site_classification_mapping = get_option( NFD_SITEGEN_OPTION . '-' . $mapping_cache_key, null );
-			
+
 			if ( ! $site_classification_mapping ) {
 				// Direct API call for site classification mapping (static data)
 				$endpoint = NFD_SITE_META_BASE . 'siteclassificationmapping';
@@ -1204,7 +1202,7 @@ class SiteGen {
 						'timeout' => 60,
 					)
 				);
-				
+
 				if ( 200 === wp_remote_retrieve_response_code( $response ) ) {
 					$site_classification_mapping = json_decode( wp_remote_retrieve_body( $response ), true );
 					self::cache_site_meta( 'siteclassificationmapping', $site_classification_mapping, 'v2' );
@@ -1213,7 +1211,7 @@ class SiteGen {
 
 			$primary_type = $parsed_response['primaryType'] ?? null;
 			$slug         = $parsed_response['slug'] ?? null;
-			
+
 			if (
 				$primary_type &&
 				$slug &&
@@ -1222,7 +1220,7 @@ class SiteGen {
 				self::generate_site_posts( $site_info, $parsed_response );
 			}
 		}
-		
+
 		return $parsed_response;
 	}
 }
