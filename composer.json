@@ -16,11 +16,21 @@
       "only": [
         "newfold-labs/*"
       ]
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/WordPress/abilities-api"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/wordpress/mcp-adapter"
     }
   ],
   "require": {
     "newfold-labs/wp-module-data": "^2.8.6",
-    "newfold-labs/wp-module-installer": "^1.6.4"
+    "newfold-labs/wp-module-installer": "^1.6.4",
+    "wordpress/abilities-api": "dev-trunk",
+    "wordpress/mcp-adapter": "dev-trunk"
   },
   "require-dev": {
     "newfold-labs/wp-php-standards": "^1.2",
@@ -39,7 +49,7 @@
       "dealerdirect/phpcodesniffer-composer-installer": true
     },
     "platform": {
-      "php": "7.3.0"
+      "php": "7.4.0"
     }
   },
   "scripts": {
@@ -62,12 +72,12 @@
       "@i18n-json"
     ],
     "i18n-ci-pre": [
-        "@i18n-pot",
-        "@i18n-po"
+      "@i18n-pot",
+      "@i18n-po"
     ],
     "i18n-ci-post": [
-        "@i18n-json",
-        "@i18n-php"
+      "@i18n-json",
+      "@i18n-php"
     ]
   },
   "scripts-descriptions": {
