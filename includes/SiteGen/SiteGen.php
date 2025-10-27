@@ -8,6 +8,8 @@ use NewfoldLabs\WP\Module\Data\SiteCapabilities;
 use NewfoldLabs\WP\Module\AI\Patterns;
 use NewfoldLabs\WP\Module\Installer\Services\PluginInstaller;
 use NewfoldLabs\WP\Module\Installer\Data\Plugins;
+use NewfoldLabs\WP\Module\Onboarding\Services\Ai\ContentGeneration\SitekitsContentGeneration;
+use NewfoldLabs\WP\Module\Onboarding\Services\SiteGenService;
 
 /**
  * The class to generate different parts of the site gen object.
@@ -60,13 +62,14 @@ class SiteGen {
 	private static function check_capabilities() {
 		$capability      = new SiteCapabilities();
 		$sitegen_enabled = $capability->get( 'hasAISiteGen' );
+
 		return $sitegen_enabled;
 	}
 
 	/**
 	 * Function to refine the site description, i.e. translate and summarize when required
 	 *
-	 * @param string $site_description The site description
+	 * @param   string  $site_description  The site description
 	 */
 	public static function get_refined_site_description( $site_description ) {
 		$refined_description = self::get_sitegen_from_cache( 'refinedSiteDescription' );
@@ -97,14 +100,15 @@ class SiteGen {
 
 		$refined_description = json_decode( wp_remote_retrieve_body( $response ), true );
 		self::cache_sitegen_response( 'refinedSiteDescription', $refined_description );
+
 		return $refined_description;
 	}
 
 	/**
 	 * Function to validate site info
 	 *
-	 * @param array  $site_info  The main input for forming the prompt
-	 * @param string $identifier The identifier to be used for generating the required meta
+	 * @param   array   $site_info   The main input for forming the prompt
+	 * @param   string  $identifier  The identifier to be used for generating the required meta
 	 */
 	private static function validate_site_info( $site_info, $identifier ) {
 		if ( array_key_exists( $identifier, self::$required_validations ) ) {
@@ -115,13 +119,14 @@ class SiteGen {
 				}
 			}
 		}
+
 		return true;
 	}
 
 	/**
 	 * Function to get the site gen response from cache based on the identifier
 	 *
-	 * @param string $identifier The identifier to be used for generating the required meta
+	 * @param   string  $identifier  The identifier to be used for generating the required meta
 	 */
 	private static function get_sitegen_from_cache( $identifier ) {
 		return get_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), null );
@@ -130,8 +135,8 @@ class SiteGen {
 	/**
 	 * Function to cache the response from sitegen API
 	 *
-	 * @param string $identifier The identifier to be used for generating the required meta
-	 * @param array  $response   The response from the sitegen API.
+	 * @param   string  $identifier  The identifier to be used for generating the required meta
+	 * @param   array   $response    The response from the sitegen API.
 	 */
 	private static function cache_sitegen_response( $identifier, $response ) {
 		update_option( NFD_SITEGEN_OPTION . '-' . strtolower( $identifier ), $response );
@@ -140,21 +145,22 @@ class SiteGen {
 	/**
 	 * Function to generate the prompt from the JSON input.
 	 *
-	 * @param array $site_info The JSON input for the sitegen call.
+	 * @param   array  $site_info  The JSON input for the sitegen call.
 	 */
 	private static function get_prompt_from_info( array $site_info ) {
 		$details = array();
 		foreach ( $site_info as $key => $value ) {
 			$details[] = $key . ': ' . $value;
 		}
+
 		return implode( ', ', $details );
 	}
 
 	/**
 	 * Get the patterns for a particular category.
 	 *
-	 * @param string $category The category to get patterns for.
-	 * @param array  $site_classification site classification as determined by AI.
+	 * @param   string  $category             The category to get patterns for.
+	 * @param   array   $site_classification  site classification as determined by AI.
 	 */
 	private static function get_patterns_for_category( $category, $site_classification = array() ) {
 		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
@@ -195,8 +201,8 @@ class SiteGen {
 	/**
 	 * Get the templates for a particular category.
 	 *
-	 * @param string $category The category to get templates for.
-	 * @param array  $site_classification site classification as determined by AI.
+	 * @param   string  $category             The category to get templates for.
+	 * @param   array   $site_classification  site classification as determined by AI.
 	 */
 	private static function get_templates_for_category( $category, $site_classification = array() ) {
 		$primary_sitetype   = isset( $site_classification['primaryType'] ) ? $site_classification['primaryType'] : null;
@@ -237,8 +243,8 @@ class SiteGen {
 	/**
 	 * Function to generate the site meta according to the arguments passed
 	 *
-	 * @param array $site_info  The Site Info object, will be validated for required params.
-	 * @param array $site_classification  The Site Classification object.
+	 * @param   array  $site_info            The Site Info object, will be validated for required params.
+	 * @param   array  $site_classification  The Site Classification object.
 	 */
 	public static function generate_site_posts( $site_info, $site_classification ) {
 
@@ -299,11 +305,11 @@ class SiteGen {
 	/**
 	 * Function to generate the site meta according to the arguments passed
 	 *
-	 * @param array   $site_info  The Site Info object, will be validated for required params.
-	 * @param string  $identifier The identifier for generating the site meta
-	 * @param string  $site_type  The type of site.
-	 * @param string  $locale     The locale for site's content.
-	 * @param boolean $skip_cache To skip returning the response from cache
+	 * @param   array    $site_info   The Site Info object, will be validated for required params.
+	 * @param   string   $identifier  The identifier for generating the site meta
+	 * @param   string   $site_type   The type of site.
+	 * @param   string   $locale      The locale for site's content.
+	 * @param   boolean  $skip_cache  To skip returning the response from cache
 	 */
 	public static function generate_site_meta( $site_info, $identifier, $site_type, $locale, $skip_cache = false ) {
 		if ( ! self::check_capabilities() ) {
@@ -346,10 +352,12 @@ class SiteGen {
 			)
 		);
 
+
 		$response_code = wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $response_code ) {
 			if ( 400 === $response_code ) {
 				$error = json_decode( wp_remote_retrieve_body( $response ), true );
+
 				return array(
 					'error' => $error['payload']['reason'],
 				);
@@ -365,7 +373,8 @@ class SiteGen {
 						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 					);
 				}
-			} catch ( \Exception $exception ) {
+			}
+			catch ( \Exception $exception ) {
 				return array(
 					'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 				);
@@ -409,9 +418,12 @@ class SiteGen {
 		// calling the action hook for the identifiers
 		do_action( 'newfold/ai/sitemeta-' . strtolower( $identifier ) . ':generated', $parsed_response );
 
+
+
 		try {
 			return $parsed_response;
-		} catch ( \Exception $exception ) {
+		}
+		catch ( \Exception $exception ) {
 			return array(
 				'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 			);
@@ -422,12 +434,12 @@ class SiteGen {
 	 * Function to get the home page patterns. Randomly generates the patterns and substitutes with existing content.
 	 * Set regenerate to get new combinations
 	 *
-	 * @param string  $site_description The site description (user prompt).
-	 * @param string  $site_type        The type of site.
-	 * @param array   $content_style    Generated from sitegen.
-	 * @param array   $target_audience  Generated target audience.
-	 * @param string  $locale           The locale for site's content.
-	 * @param boolean $regenerate       If we need to regenerate.
+	 * @param   string   $site_description  The site description (user prompt).
+	 * @param   string   $site_type         The type of site.
+	 * @param   array    $content_style     Generated from sitegen.
+	 * @param   array    $target_audience   Generated target audience.
+	 * @param   string   $locale            The locale for site's content.
+	 * @param   boolean  $regenerate        If we need to regenerate.
 	 */
 	public static function get_home_pages( $site_description, $site_type, $content_style, $target_audience, $locale, $regenerate = false ) {
 		if ( ! self::check_capabilities() ) {
@@ -497,6 +509,7 @@ class SiteGen {
 			if ( 200 !== $response_code ) {
 				if ( 400 === $response_code ) {
 					$error = json_decode( wp_remote_retrieve_body( $response ), true );
+
 					return array(
 						'error' => $error['payload']['reason'],
 					);
@@ -512,7 +525,8 @@ class SiteGen {
 							'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 						);
 					}
-				} catch ( \Exception $exception ) {
+				}
+				catch ( \Exception $exception ) {
 					return array(
 						'error' => __( 'We are unable to process the request at this moment', 'wp-module-ai' ),
 					);
@@ -667,16 +681,17 @@ class SiteGen {
 		}
 
 		self::cache_sitegen_response( 'homepages', $generated_homepages );
+
 		return $generated_homepages;
 	}
 
 	/**
 	 * Function to get the content for a page
 	 *
-	 * @param string $site_description The site description (user prompt).
-	 * @param string $site_type        The type of site. (eg: business, ecommerce, personal)
-	 * @param string $page             The page slug
-	 * @param string $locale           The site content's locale.
+	 * @param   string  $site_description  The site description (user prompt).
+	 * @param   string  $site_type         The type of site. (eg: business, ecommerce, personal)
+	 * @param   string  $page              The page slug
+	 * @param   string  $locale            The site content's locale.
 	 *
 	 * @return string|null The page content or null if the page content was not created
 	 */
@@ -740,16 +755,17 @@ class SiteGen {
 	/**
 	 * Function to generate the content for a page.
 	 *
-	 * @param array  $pages           The pages to generate.
-	 * @param string $site_description The site description (user prompt).
-	 * @param string $site_type       The type of site. (eg: business, ecommerce, personal).
-	 * @param array  $content_style   The content style.
-	 * @param array  $target_audience The target audience.
-	 * @param string $locale          The site content's locale.
+	 * @param   array   $pages             The pages to generate.
+	 * @param   string  $site_description  The site description (user prompt).
+	 * @param   string  $site_type         The type of site. (eg: business, ecommerce, personal).
+	 * @param   array   $content_style     The content style.
+	 * @param   array   $target_audience   The target audience.
+	 * @param   string  $locale            The site content's locale.
 	 *
 	 * @return array The pages content.
 	 */
 	private static function generate_pages_content( array $pages, string $site_description, string $site_type, $content_style, $target_audience, string $locale ): array {
+
 		// Site classification: primary and secondary types
 		$site_classification = self::get_sitegen_from_cache( 'siteclassification' );
 		$primary_type        = 'other';
@@ -785,7 +801,6 @@ class SiteGen {
 				),
 			);
 		}
-
 		// Generate pages in parallel
 		$pages_content = array();
 		\WpOrg\Requests\Requests::request_multiple(
@@ -831,13 +846,13 @@ class SiteGen {
 	/**
 	 * Function to get the page patterns
 	 *
-	 * @param string  $site_description The site description (user prompt).
-	 * @param string  $site_type        The type of site. (eg: business, ecommerce, personal)
-	 * @param array   $content_style    Generated from sitegen.
-	 * @param array   $target_audience  Generated target audience.
-	 * @param array   $site_map         The site map
-	 * @param string  $locale           The site content's locale.
-	 * @param boolean $skip_cache       To skip or not to skip
+	 * @param   string   $site_description  The site description (user prompt).
+	 * @param   string   $site_type         The type of site. (eg: business, ecommerce, personal)
+	 * @param   array    $content_style     Generated from sitegen.
+	 * @param   array    $target_audience   Generated target audience.
+	 * @param   array    $site_map          The site map
+	 * @param   string   $locale            The site content's locale.
+	 * @param   boolean  $skip_cache        To skip or not to skip
 	 *
 	 * @return array The pages content
 	 */
@@ -882,6 +897,20 @@ class SiteGen {
 				continue;
 			}
 
+			if ( ! empty( $sitekik_content ) && isset( $sitekik_content[ $page ] ) ) {
+				$content = array();
+				foreach ( $sitekik_content[ $page ] as $page_slug => $page_content ) {
+					$content[ $page_slug ] = $page_content;
+				}
+
+				$pages_content[ $page ] = array(
+					'order'   => $order,
+					'content' => $content,
+				);
+
+				continue;
+			}
+
 			// Generate pages that don't require AI generated content
 			if ( 'contact' === $page || 'menu' === $page ) {
 				$response = self::get_static_page_content(
@@ -906,7 +935,6 @@ class SiteGen {
 				'keywords' => $keywords,
 			);
 		}
-
 		// Merge static and AI generated pages
 		$pages_content = array_merge(
 			$pages_content,
