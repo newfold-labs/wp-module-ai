@@ -9,6 +9,8 @@ use NewfoldLabs\WP\Module\AI\Patterns;
 use NewfoldLabs\WP\Module\Installer\Services\PluginInstaller;
 use NewfoldLabs\WP\Module\Installer\Data\Plugins;
 
+use function NewfoldLabs\WP\ModuleLoader\container;
+
 /**
  * The class to generate different parts of the site gen object.
  */
@@ -64,6 +66,15 @@ class SiteGen {
 	}
 
 	/**
+	 * Get the current brand from the container.
+	 *
+	 * @return string The brand identifier.
+	 */
+	private static function get_brand() {
+		return container()->plugin()->brand;
+	}
+
+	/**
 	 * Function to refine the site description, i.e. translate and summarize when required
 	 *
 	 * @param string $site_description The site description
@@ -78,7 +89,8 @@ class SiteGen {
 			NFD_AI_BASE . 'refineSiteDescription',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'    => 'application/json',
+					'X-Newfold-Brand' => self::get_brand(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
@@ -247,7 +259,8 @@ class SiteGen {
 			NFD_AI_BASE . 'generateSiteMeta',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'    => 'application/json',
+					'X-Newfold-Brand' => self::get_brand(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
@@ -331,7 +344,8 @@ class SiteGen {
 			NFD_AI_BASE . 'generateSiteMeta',
 			array(
 				'headers' => array(
-					'Content-Type' => 'application/json',
+					'Content-Type'    => 'application/json',
+					'X-Newfold-Brand' => self::get_brand(),
 				),
 				'timeout' => 60,
 				'body'    => wp_json_encode(
