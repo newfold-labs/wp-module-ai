@@ -68,10 +68,18 @@ class SiteGen {
 	/**
 	 * Get the current brand from the container.
 	 *
+	 * Allows plugins to filter the brand identifier used for AI SiteGen API requests.
+	 *
 	 * @return string The brand identifier.
 	 */
 	private static function get_brand() {
-		return container()->plugin()->brand;
+		$brand = container()->plugin()->brand;
+
+		/**
+		 * This allows plugins to map their brand to a different brand identifier
+		 * for AI SiteGen API requests (e.g., mapping sub-brands to a parent brand).
+		 */
+		return apply_filters( 'newfold_ai_sitegen_brand', $brand );
 	}
 
 	/**
