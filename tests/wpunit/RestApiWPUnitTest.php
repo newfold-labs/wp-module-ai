@@ -12,7 +12,7 @@ use NewfoldLabs\WP\Module\AI\RestApi\AISearchController;
 class RestApiWPUnitTest extends \lucatume\WPBrowser\TestCase\WPTestCase {
 
 	/**
-	 * rest_api_init registers newfold-ai REST routes.
+	 * Verifies that rest_api_init registers newfold-ai REST routes.
 	 *
 	 * Routes must be registered on rest_api_init. Register the controller
 	 * inside that action so WordPress does not trigger an incorrect usage notice.
