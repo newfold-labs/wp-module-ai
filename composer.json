@@ -24,7 +24,10 @@
   },
   "require-dev": {
     "newfold-labs/wp-php-standards": "^1.2",
-    "wp-cli/i18n-command": "^2.6.5"
+    "wp-cli/i18n-command": "^2.6.5",
+    "johnpbloch/wordpress": "@stable",
+    "lucatume/wp-browser": "*",
+    "phpunit/phpcov": "*"
   },
   "autoload": {
     "psr-4": {
@@ -36,7 +39,9 @@
   },
   "config": {
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "composer/installers": true,
+      "johnpbloch/wordpress-core-installer": true
     },
     "platform": {
       "php": "7.3.0"
@@ -62,16 +67,26 @@
       "@i18n-json"
     ],
     "i18n-ci-pre": [
-        "@i18n-pot",
-        "@i18n-po"
+      "@i18n-pot",
+      "@i18n-po"
     ],
     "i18n-ci-post": [
-        "@i18n-json",
-        "@i18n-php"
+      "@i18n-json",
+      "@i18n-php"
+    ],
+    "test": [
+      "codecept run wpunit"
+    ],
+    "test-coverage": [
+      "codecept run wpunit --coverage wpunit.cov",
+      "phpcov merge --php tests/_output/merged.cov --html tests/_output/html tests/_output;",
+      "echo \"open tests/_output/html/index.html\" to view the report"
     ]
   },
   "scripts-descriptions": {
     "fix": "Automatically fix coding standards issues where possible.",
-    "lint": "Check files against coding standards."
+    "lint": "Check files against coding standards.",
+    "test": "Run wpunit tests.",
+    "test-coverage": "Run wpunit tests with coverage."
   }
 }
