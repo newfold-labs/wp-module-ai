@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1770426333">
-  <project timestamp="1770426333">
+<coverage generated="1770848063">
+  <project timestamp="1770848063">
     <file name="/home/runner/work/wp-module-ai/wp-module-ai/includes/AI.php">
       <class name="NewfoldLabs\WP\Module\AI\AI" namespace="global">
         <metrics complexity="4" methods="3" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="14" coveredstatements="0" elements="17" coveredelements="0"/>
