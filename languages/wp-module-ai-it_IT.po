@@ -33,23 +33,22 @@ msgstr "Non sei autorizzato a effettuare questa chiamata"
 msgid "You must be authenticated to make this call"
 msgstr "Devi essere autenticato per effettuare questa chiamata"
 
-#: includes/SiteGen/SiteGen.php:181 includes/SiteGen/SiteGen.php:223
-#: includes/SiteGen/SiteGen.php:365 includes/SiteGen/SiteGen.php:370
-#: includes/SiteGen/SiteGen.php:416 includes/SiteGen/SiteGen.php:512
-#: includes/SiteGen/SiteGen.php:517 includes/SiteGen/SiteGen.php:790
-#: includes/SiteGen/SiteGen.php:795 includes/Utils/AISearchUtil.php:53
+#: includes/SiteGen/SiteGen.php:201 includes/SiteGen/SiteGen.php:243
+#: includes/SiteGen/SiteGen.php:387 includes/SiteGen/SiteGen.php:392
+#: includes/SiteGen/SiteGen.php:438 includes/SiteGen/SiteGen.php:534
+#: includes/SiteGen/SiteGen.php:539 includes/Utils/AISearchUtil.php:53
 #: includes/Utils/AISearchUtil.php:77 includes/Utils/AISearchUtil.php:85
 #: includes/Utils/AISearchUtil.php:96 includes/Utils/AISearchUtil.php:110
 #: includes/Utils/AISearchUtil.php:131 includes/Utils/AISearchUtil.php:143
 msgid "We are unable to process the request at this moment"
 msgstr "Non siamo in grado di elaborare la richiesta in questo momento"
 
-#: includes/SiteGen/SiteGen.php:311 includes/SiteGen/SiteGen.php:435
-#: includes/SiteGen/SiteGen.php:831
+#: includes/SiteGen/SiteGen.php:332 includes/SiteGen/SiteGen.php:457
+#: includes/SiteGen/SiteGen.php:877
 msgid "You do not have the permissions to perform this action"
 msgstr "Non hai i permessi per eseguire questa azione"
 
-#: includes/SiteGen/SiteGen.php:317
+#: includes/SiteGen/SiteGen.php:338
 msgid "Required values not provided"
 msgstr "Valori richiesti non forniti"
 
