@@ -19,10 +19,10 @@ permissions: {}
 jobs:
   translate:
     name: 'Check and update translations'
-    uses: newfold-labs/workflows/.github/workflows/reusable-translations.yml@main
     permissions:
       contents: write      # Required for reusable workflow to push translation updates.
       pull-requests: write # Required for reusable workflow to create/update pull requests.
+    uses: newfold-labs/workflows/.github/workflows/reusable-translations.yml@main
     timeout-minutes: 30
     with:
       text_domain: 'wp-module-ai'
