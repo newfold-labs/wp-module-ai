@@ -19,6 +19,7 @@ jobs:
     name: Setup
     runs-on: ubuntu-latest
     permissions: {} # Branch name comes from workflow env/context only; no checkout or GitHub API calls.
+    timeout-minutes: 30
     outputs:
       branch: ${{ steps.extract_branch.outputs.branch }}
     steps:
@@ -34,6 +35,7 @@ jobs:
     uses: newfold-labs/workflows/.github/workflows/module-plugin-test-playwright.yml@main
     permissions:
       contents: read # Required for reusable workflow to clone private module/plugin repos with GITHUB_TOKEN.
+    timeout-minutes: 90
     with:
       module-repo: ${{ github.repository }}
       module-branch: ${{ needs.setup.outputs.branch }}
@@ -46,6 +48,7 @@ jobs:
     uses: newfold-labs/workflows/.github/workflows/module-plugin-test-playwright.yml@main
     permissions:
       contents: read # Required for reusable workflow to clone private module/plugin repos with GITHUB_TOKEN.
+    timeout-minutes: 90
     with:
       module-repo: ${{ github.repository }}
       module-branch: ${{ needs.setup.outputs.branch }}

@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: write      # Required for reusable workflow to push translation commits/branches.
       pull-requests: write # Required for reusable workflow to open/update pull requests.
+    timeout-minutes: 30
     with:
       base_branch: ${{ inputs.base_branch }}
       CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
