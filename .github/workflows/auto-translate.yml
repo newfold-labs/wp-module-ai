@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: write      # Required for reusable workflow to push translation updates.
       pull-requests: write # Required for reusable workflow to create/update pull requests.
+    timeout-minutes: 30
     with:
       text_domain: 'wp-module-ai'
     secrets:
