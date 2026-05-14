@@ -31,10 +31,10 @@ jobs:
 
   codecoverage:
     needs: get-repo-name
-    uses: newfold-labs/workflows/.github/workflows/reusable-codecoverage.yml@main
     permissions:
       contents: write      # Required for reusable workflow to publish coverage (e.g. gh-pages branch).
       pull-requests: write # Required for reusable workflow to comment or update the PR with coverage.
+    uses: newfold-labs/workflows/.github/workflows/reusable-codecoverage.yml@main
     timeout-minutes: 60
     with:
       php-versions: '["7.4", "8.0", "8.1", "8.2", "8.3", "8.4"]'
