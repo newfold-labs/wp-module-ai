@@ -1,0 +1,8 @@
+{
+  "name": "wp-module-ai",
+  "version": "1.3.5",
+  "engines": {
+    "node": ">=22.11.0",
+    "npm": ">=10.9.0"
+  }
+}
